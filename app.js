@@ -617,7 +617,7 @@
   });
 
   $("#pie").textContent =
-    `Datos: USDA FoodData Central (${window.USDA.versiones.join(", ")}; dominio público CC0). Biblioteca pública: solo ingredientes genéricos. Fichas técnicas y formulaciones nunca salen de este navegador.`;
+    `Datos: USDA FoodData Central (${window.USDA.versiones.join(", ")}; dominio público CC0) y ANSES-CIQUAL 2025 (Etalab 2.0, versión del 19-nov-2025) en la biblioteca pública. Biblioteca pública: solo ingredientes genéricos. Fichas técnicas y formulaciones nunca salen de este navegador.`;
   $("#pegado").value = EJEMPLO;
   st.formula = leerPegado(EJEMPLO);
   $("#aviso-ejemplo").hidden = false;

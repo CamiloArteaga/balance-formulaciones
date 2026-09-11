@@ -39,6 +39,8 @@ Todo se calcula en el navegador. La formulación no se guarda ni se envía a nin
 ## Fuentes de datos
 
 - USDA FoodData Central: SR Legacy (abril 2018) y Foundation Foods (abril 2026), 8.262 alimentos, filtrados a los 23 componentes que usa la herramienta.
+- ANSES-CIQUAL 2025 (Table de composition nutritionnelle des aliments Ciqual 2025, versión del 19-nov-2025, doi:10.57745/RDMHWY, licencia Etalab 2.0): valores de ingredientes que USDA no trae, cargados en la biblioteca pública como `valores` con su código CIQUAL.
+- Aditivos (espesantes, conservantes, fosfatos, leudantes, edulcorantes) en la biblioteca pública: USDA SR Legacy cuando existe; si no, etiquetas de USDA Branded con el aditivo como único ingrediente (sin humedad ni cenizas); y, como último recurso, estequiometría del compuesto puro, con la fórmula en `ref`.
 - Fichas técnicas de proveedores (Res. 810 de 2021, art. 10.5), solo en la biblioteca privada.
 
 ## Biblioteca privada
@@ -74,5 +76,6 @@ Para actualizar USDA: descargar los CSV de SR Legacy y Foundation desde https://
 ## Límites
 
 - La búsqueda automática es una sugerencia: todo lo que elige queda marcado para revisar. Frente a 103 ingredientes ya asignados a mano, coincide con el mismo alimento en 90.
-- La base local no incluye USDA Branded ni FNDDS; esos ID se cargan como valores en la biblioteca privada.
+- La base local no incluye USDA Branded ni FNDDS; esos ID se cargan como valores en una biblioteca.
+- Carragenina, goma arábiga, alginato, CMC, metilcelulosa, almidón modificado, konjac y caseinato no tienen fuente abierta: necesitan la ficha técnica.
 - Los azúcares añadidos no vienen en USDA: salen de la formulación.
