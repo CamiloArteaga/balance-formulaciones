@@ -54,7 +54,7 @@ Los nombres comerciales y los valores de fichas técnicas **no están en este re
 ]
 ```
 
-Claves de `valores` (por 100 g): `hum` `n` `prot` `grasa` `sat` `trans` (mg) `azt` `aza` `fib` `cen` `cho` `vita` (µg) `vitd` (µg) `vitc` `col` `na` `k` `ca` `zn` `fe` `cu` `mg` `mn` (minerales, vit C y colesterol en mg).
+`estado` es opcional: si falta, el ingrediente se muestra como «Revisado». Claves de `valores` (por 100 g): `hum` `n` `prot` `grasa` `sat` `trans` (mg) `azt` `aza` `fib` `cen` `cho` `vita` (µg) `vitd` (µg) `vitc` `col` `na` `k` `ca` `zn` `fe` `cu` `mg` `mn` (minerales, vit C y colesterol en mg).
 
 ## Estructura
 

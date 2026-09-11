@@ -147,10 +147,10 @@
       };
     if (e && e.bib) {
       const b = C.buscarEnBiblioteca(e.bib, todas());
-      if (b) return b;
+      if (b) return { estado: "revisado", ...b };
     }
     const b = C.buscarEnBiblioteca(nombre, todas());
-    if (b) return b;
+    if (b) return { estado: "revisado", ...b };
     const a = autoPara(nombre);
     return a
       ? {

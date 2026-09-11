@@ -531,11 +531,18 @@
   }
 
   // Elige solo si reconoce la palabra principal y encuentra todas las obligatorias; si no, se elige a mano.
+  // Tampoco elige un procesado no pedido cuyo nombre no empieza por el ingrediente (almidón → gomitas).
   function elegirAutomatico(usda, nombre, claves) {
     const terminos = terminosDe(nombre);
     if (!terminos.length || terminos[0].desconocido) return null;
     const c = candidatosUSDA(usda, nombre, claves);
     if (!c.length || c[0].aciertos < c[0].total) return null;
+    const w = c[0].desc.toLowerCase().match(/[a-z]+/g) || [];
+    const pedidos = terminos.flatMap((t) => t.alts.flatMap((x) => x.split(" ")));
+    const duros = terminos.filter((t) => !t.blando);
+    const cabeza = c[0].desc.split(",")[0].toLowerCase().match(/[a-z]+/g) || [];
+    const enCabeza = (duros[0] || terminos[0]).alts.some((alt) => coincide(alt, cabeza));
+    if (!enCabeza && PENALIZA.some((x) => w.includes(x) && !pedidos.includes(x))) return null;
     return { ...c[0], alternativas: c.slice(1, 4) };
   }
 
