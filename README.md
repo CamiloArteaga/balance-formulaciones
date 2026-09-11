@@ -69,7 +69,7 @@ Los nombres comerciales y los valores de fichas técnicas **no están en este re
 | `datos/usda.js` | Base USDA filtrada |
 | `datos/biblioteca.js` | Biblioteca pública (solo ingredientes genéricos) |
 | `scripts/generar_usda.py` | Regenera `datos/usda.js` desde los CSV de FoodData Central |
-| `vendor/` | SheetJS 0.18.5 y ExcelJS 4.4.0 |
+| `vendor/` | SheetJS 0.18.5 (Apache 2.0) y ExcelJS 4.4.0 (MIT), con sus licencias |
 
 Para actualizar USDA: descargar los CSV de SR Legacy y Foundation desde https://fdc.nal.usda.gov/download-datasets, descomprimirlos en una carpeta y ejecutar `python scripts/generar_usda.py <carpeta>`.
 
