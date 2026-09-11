@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Balance de formulaciones</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=IBM+Plex+Mono:wght@400;500&display=swap"
+    />
+    <link rel="stylesheet" href="estilos.css" />
+  </head>
+  <body>
+    <header class="barra">
+      <div>
+        <h1>Balance de formulaciones</h1>
+        <p>
+          Perfil teórico por composición con USDA FoodData Central, frente al
+          resultado del laboratorio.
+        </p>
+      </div>
+      <p class="privacidad">
+        Todo se calcula en este navegador. Nada se envía a ningún servidor.
+      </p>
+    </header>
+
+    <main>
+      <section>
+        <h2>Producto</h2>
+        <div class="campos">
+          <label for="consecutivo"
+            >Consecutivo<input
+              id="consecutivo"
+              inputmode="numeric"
+              autocomplete="off"
+              placeholder="Número de la muestra"
+          /></label>
+          <label for="producto"
+            >Producto<input
+              id="producto"
+              autocomplete="off"
+              placeholder="Nombre del producto"
+          /></label>
+          <label for="porcion"
+            >Porción (g)<input
+              id="porcion"
+              type="number"
+              value="50"
+              min="1"
+              step="1"
+          /></label>
+        </div>
+      </section>
+
+      <section>
+        <div class="tit">
+          <h2>Formulación</h2>
+          <span id="suma" class="suma"></span>
+        </div>
+        <p class="ayuda">
+          Pega desde Excel dos columnas: ingrediente y porcentaje. Cada fila
+          busca primero en tu biblioteca privada, luego en la pública; si no
+          encuentra, eliges en USDA.
+        </p>
+        <div class="pegar">
+          <label for="pegado" class="oculto">Formulación</label>
+          <textarea id="pegado" rows="6" spellcheck="false"></textarea>
+          <button id="leer" class="btn">Leer formulación</button>
+        </div>
+        <p id="aviso-ejemplo" class="ejemplo" hidden>
+          Ejemplo genérico cargado para mostrar la herramienta. Pega tu
+          formulación y pulsa «Leer formulación».
+        </p>
+        <div class="tbl"><table id="t-formula"></table></div>
+      </section>
+
+      <section class="dos">
+        <div>
+          <h2>Bibliotecas</h2>
+          <p id="info-bib" class="ayuda"></p>
+          <div class="acciones">
+            <label class="btn" for="archivo-privada"
+              >Cargar biblioteca privada (.json)</label
+            >
+            <input
+              id="archivo-privada"
+              type="file"
+              accept=".json,application/json"
+              class="oculto"
+            />
+            <button id="bajar-privada" class="btn sec">
+              Descargar biblioteca privada
+            </button>
+            <button id="quitar-privada" class="btn sec">Quitar</button>
+          </div>
+          <p class="nota">
+            La biblioteca privada lleva las fichas técnicas y los nombres
+            comerciales. Queda guardada solo en este navegador.
+          </p>
+        </div>
+        <div>
+          <h2>Laboratorio</h2>
+          <div class="acciones">
+            <label class="btn" for="archivo-r07"
+              >Cargar resultados de laboratorio (.xlsx)</label
+            >
+            <input
+              id="archivo-r07"
+              type="file"
+              accept=".xlsx,.xlsm"
+              class="oculto"
+            />
+          </div>
+          <p id="info-r07" class="nota">
+            Se lee en este navegador, sin modificarlo. También puedes escribir
+            los valores a mano.
+          </p>
+        </div>
+      </section>
+
+      <section>
+        <h2>Resultado práctico</h2>
+        <div id="lab" class="lab"></div>
+      </section>
+
+      <section>
+        <div class="tit">
+          <h2>Teórico frente a práctico</h2>
+          <button id="descargar" class="btn primario">Descargar Excel</button>
+        </div>
+        <p id="resumen" class="resumen"></p>
+        <div class="label">
+          <div class="tbl sin-borde"><table id="t-resultado"></table></div>
+          <div class="legend">
+            <span class="l1">hasta 10 %</span><span class="l2">10 a 25 %</span
+            ><span class="l3">más de 25 %</span><span>barra: ±100 %</span>
+          </div>
+        </div>
+        <h3>Fuentes e ID</h3>
+        <div class="tbl"><table id="t-fuentes"></table></div>
+      </section>
+    </main>
+
+    <footer id="pie"></footer>
+
+    <script src="vendor/xlsx.full.min.js"></script>
+    <script src="vendor/exceljs.min.js"></script>
+    <script src="datos/usda.js"></script>
+    <script src="datos/biblioteca.js"></script>
+    <script src="calculo.js"></script>
+    <script src="excel.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

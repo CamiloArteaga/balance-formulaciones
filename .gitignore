@@ -1,0 +1,11 @@
+# Nunca subir datos de clientes ni registros del laboratorio
+*.xlsx
+*.xls
+*.xlsm
+*.csv
+*.pdf
+*.docx
+*.zip
+privado/
+biblioteca_privada*.json
+formulaciones/
