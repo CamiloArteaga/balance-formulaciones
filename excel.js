@@ -50,6 +50,8 @@
 
   const r4 = (x) => Math.round(x * 1e4) / 1e4;
   const r2 = (x) => Math.round(x * 100) / 100;
+  const elegidos = (ctx, C) =>
+    C.PARAMS.filter(([k]) => !ctx.claves || ctx.claves.includes(k));
 
   function encabezado(fila) {
     fila.eachCell((c) => {
@@ -59,6 +61,7 @@
     });
   }
 
+  // Misma estructura que el Cálculo TN: siempre con sus columnas fijas.
   function hojaCalculoTN(wb, ctx, C) {
     const { filas, res } = ctx;
     const ws = wb.addWorksheet("Cálculo TN");
@@ -111,7 +114,6 @@
       };
 
     const P = res.practico;
-    const reporte = {};
     ws.getCell(`A${rep}`).value = "Total para reportar";
     ws.getCell(`A${rep}`).font = NEGRITA;
     ws.getCell(`B${rep}`).value = {
@@ -122,22 +124,22 @@
       formula: `SUM(C${ini}:C${teo - 1})`,
       result: 100,
     };
-    reporte.E = C.esNumero(P.azt) ? r2(P.azt) : suma.E;
+    const azt = C.esNumero(P.azt) ? r2(P.azt) : suma.E;
     ws.getCell(`E${rep}`).value = C.esNumero(P.azt)
-      ? reporte.E
-      : { formula: `E${teo}`, result: reporte.E };
+      ? azt
+      : { formula: `E${teo}`, result: azt };
     ws.getCell(`G${rep}`).value = {
       formula: `IF(E${teo}=0,0,E${rep}*G${teo}/E${teo})`,
-      result: suma.E ? (reporte.E * suma.G) / suma.E : 0,
+      result: suma.E ? (azt * suma.G) / suma.E : 0,
     };
-    reporte.I = C.esNumero(P.grasa) ? r2(P.grasa) : suma.I;
+    const grasa = C.esNumero(P.grasa) ? r2(P.grasa) : suma.I;
     ws.getCell(`I${rep}`).value = C.esNumero(P.grasa)
-      ? reporte.I
-      : { formula: `I${teo}`, result: reporte.I };
+      ? grasa
+      : { formula: `I${teo}`, result: grasa };
     for (const a of ["K", "M", "O", "Q"]) {
       ws.getCell(`${a}${rep}`).value = {
         formula: `IF($I$${teo}=0,0,$I$${rep}*${a}${teo}/$I$${teo})`,
-        result: suma.I ? (reporte.I * suma[a]) / suma.I : 0,
+        result: suma.I ? (grasa * suma[a]) / suma.I : 0,
       };
     }
     for (let col = 5; col <= 17; col++) ws.getCell(rep, col).border = BORDE;
@@ -176,6 +178,8 @@
       ["proteína", r2(valor("prot")), 4],
       ["fibra", r2(valor("fib")), 2],
     ];
+    let d = 0,
+      e = 0;
     nutrientes.forEach(([nombre, cantidad, factor], i) => {
       const r = cab + 1 + i;
       const b = typeof cantidad === "number" ? cantidad : cantidad.result;
@@ -195,11 +199,19 @@
         formula: `E${r}*F${r}`,
         result: ((b * ctx.porcion) / 100) * factor,
       };
+      d += b * factor;
+      e += ((b * ctx.porcion) / 100) * factor;
     });
     const tot = cab + 5;
     ws.getCell(`A${tot}`).value = "total";
-    ws.getCell(`D${tot}`).value = { formula: `SUM(D${cab + 1}:D${cab + 4})` };
-    ws.getCell(`G${tot}`).value = { formula: `SUM(G${cab + 1}:G${cab + 4})` };
+    ws.getCell(`D${tot}`).value = {
+      formula: `SUM(D${cab + 1}:D${cab + 4})`,
+      result: d,
+    };
+    ws.getCell(`G${tot}`).value = {
+      formula: `SUM(G${cab + 1}:G${cab + 4})`,
+      result: e,
+    };
     for (let r = cal; r <= tot; r++)
       for (let col = 1; col <= 7; col++) ws.getCell(r, col).border = BORDE;
     ws.getCell(`A${tot + 2}`).value = C.esNumero(P.grasa)
@@ -227,7 +239,7 @@
     ws.addRow([]);
     encabezado(
       ws.addRow([
-        "Parámetro",
+        "Componente",
         "Unidad /100 g",
         "Teórico mezcla",
         "Teórico ajustado a humedad",
@@ -237,7 +249,7 @@
         "Origen del dato práctico",
       ]),
     );
-    for (const [k, nombre, unidad] of C.PARAMS) {
+    for (const [k, nombre, unidad] of elegidos(ctx, C)) {
       const p = res.practico[k];
       ws.addRow([
         nombre,
@@ -263,40 +275,43 @@
 
   function hojaAporte(wb, ctx, C) {
     const { filas, res } = ctx;
+    const ps = elegidos(ctx, C);
     const ws = wb.addWorksheet("Aporte por ingrediente");
     encabezado(
       ws.addRow([
         "Ingrediente",
-        "%",
-        ...C.PARAMS.map((p) => `${p[1]} (${p[2]})`),
+        "% en fórmula",
+        ...ps.map((p) => `${p[1]} (${p[2]})`),
       ]),
     );
     for (const f of filas) {
+      const pct = (f.pct / res.total) * 100;
       ws.addRow([
         f.nombre,
-        f.pct,
-        ...C.PARAMS.map(([k]) =>
+        r4(pct),
+        ...ps.map(([k]) =>
           f.perfil && C.esNumero(f.perfil[k])
-            ? r4((f.pct * f.perfil[k]) / 100)
+            ? r4((pct * f.perfil[k]) / 100)
             : "—",
         ),
       ]);
     }
     ws.addRow([
       "TOTAL mezcla",
-      r2(res.total),
-      ...C.PARAMS.map(([k]) => r4(res.teorico[k])),
+      100,
+      ...ps.map(([k]) => r4(res.teorico[k])),
     ]).font = NEGRITA;
     ws.getColumn(1).width = 28;
-    for (let i = 2; i <= C.PARAMS.length + 2; i++) ws.getColumn(i).width = 12;
+    for (let i = 2; i <= ps.length + 2; i++) ws.getColumn(i).width = 12;
   }
 
   function hojaFuentes(wb, ctx, C) {
+    const ps = elegidos(ctx, C);
     const ws = wb.addWorksheet("Fuentes e IDs");
     encabezado(
       ws.addRow([
         "Ingrediente",
-        "%",
+        "Cantidad",
         "Fuente usada",
         "Referencia",
         "Estado",
@@ -307,16 +322,16 @@
     );
     for (const f of ctx.filas) {
       const comp = (f.complementos || [])
+        .filter((c) => ps.some((p) => p[0] === c.clave))
         .map(
           (c) =>
             `${C.NOMBRE[c.clave]} ← ${c.fdc} «${c.desc.slice(0, 60)}» (similitud ${c.sim.toFixed(2)})`,
         )
         .join("\n");
-      const faltan = f.perfil
-        ? C.PARAMS.filter(([k]) => !(k in f.perfil))
-            .map((p) => p[1])
-            .join(", ")
-        : "Todos";
+      const faltan = ps
+        .filter(([k]) => !f.perfil || !(k in f.perfil))
+        .map((p) => p[1])
+        .join(", ");
       ws.addRow([
         f.nombre,
         f.pct,
@@ -328,7 +343,7 @@
         f.nota || "",
       ]);
     }
-    [28, 8, 50, 22, 14, 60, 40, 50].forEach((w, i) => {
+    [28, 10, 50, 22, 16, 60, 40, 50].forEach((w, i) => {
       ws.getColumn(i + 1).width = w;
     });
     ws.eachRow((fila) =>

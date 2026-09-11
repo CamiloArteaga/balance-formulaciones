@@ -1,6 +1,7 @@
 (function () {
   "use strict";
   const C = window.Calculo;
+  const B = window.Busqueda;
   const $ = (s) => document.querySelector(s);
   const guardado = {
     leer(k, d) {
@@ -20,7 +21,38 @@
     },
   };
   const EJEMPLO =
-    "Ripio de pollo\t60\nCarne de cerdo magra\t18\nSal refinada\t1,5\nAjo en polvo\t0,1\nAlmidón de yuca\t3\nProteína concentrada de soya\t3\nAgua\t14,4";
+    "Ripio de pollo\t60\nCarne de cerdo magra\t18\nSal refinada\t1,5\nAjo en polvo\t0,1\nPimienta negra\t0,1\nAlmidón de yuca\t3\nProteína concentrada de soya\t3\nAgua\t14,3";
+  const GRUPOS = [
+    [
+      "Composición proximal",
+      ["hum", "n", "prot", "grasa", "cen", "fib", "cho"],
+    ],
+    ["Lípidos", ["sat", "trans", "col"]],
+    ["Azúcares", ["azt", "aza"]],
+    ["Vitaminas", ["vita", "vitd", "vitc"]],
+    ["Minerales", ["na", "k", "ca", "zn", "fe", "cu", "mg", "mn"]],
+  ];
+  const HABITUAL = [
+    "hum",
+    "n",
+    "prot",
+    "grasa",
+    "sat",
+    "trans",
+    "azt",
+    "aza",
+    "fib",
+    "cen",
+    "cho",
+    "vita",
+    "vitd",
+    "col",
+    "na",
+    "k",
+    "ca",
+    "zn",
+    "fe",
+  ];
   const LAB_CLAVES = [
     "hum",
     "n",
@@ -44,6 +76,7 @@
     revisado: ["Revisado", "c-ok"],
     propuesto: ["Propuesto", "c-rep"],
     elegido: ["Elegido", "c-keep"],
+    automático: ["Automático · revisar", "c-rep"],
     "sin soporte": ["Sin soporte", "c-no"],
     "sin fuente": ["Sin fuente", "c-no"],
     error: ["Error", "c-no"],
@@ -53,6 +86,7 @@
     formula: [],
     elecciones: guardado.leer("elecciones", {}),
     privada: guardado.leer("bibliotecaPrivada", []),
+    claves: guardado.leer("componentes", HABITUAL),
     lab: {},
     origenLab: {},
     r07: null,
@@ -61,6 +95,7 @@
     ultimo: null,
   };
   const cache = new Map();
+  const autos = new Map();
 
   const esc = (s) =>
     String(s ?? "").replace(
@@ -80,6 +115,25 @@
     return isFinite(v) ? v : null;
   };
   const todas = () => [...st.privada, ...window.BIBLIOTECA];
+  const elegidos = () => C.PARAMS.filter(([k]) => st.claves.includes(k));
+  const grupoDe = (k) => GRUPOS.findIndex(([, ks]) => ks.includes(k));
+
+  function cobertura(fdc) {
+    const a = window.USDA.alimentos[fdc];
+    const idx = st.claves
+      .map((k) => window.USDA.claves.indexOf(k))
+      .filter((i) => i >= 0);
+    return a
+      ? `${idx.filter((i) => a[4][i] !== null).length}/${idx.length}`
+      : "";
+  }
+
+  function autoPara(nombre) {
+    const n = C.normalizar(nombre);
+    if (!autos.has(n))
+      autos.set(n, B.elegirAutomatico(window.USDA, nombre, st.claves));
+    return autos.get(n);
+  }
 
   function entradaPara(nombre) {
     const e = st.elecciones[C.normalizar(nombre)];
@@ -91,8 +145,22 @@
         estado: "elegido",
         nota: "Elegido en la herramienta",
       };
-    if (e && e.bib) return C.buscarEnBiblioteca(e.bib, todas());
-    return C.buscarEnBiblioteca(nombre, todas());
+    if (e && e.bib) {
+      const b = C.buscarEnBiblioteca(e.bib, todas());
+      if (b) return b;
+    }
+    const b = C.buscarEnBiblioteca(nombre, todas());
+    if (b) return b;
+    const a = autoPara(nombre);
+    return a
+      ? {
+          nombre,
+          tipo: "usda",
+          fdc: a.fdc,
+          estado: "automático",
+          nota: "Encontrado por la búsqueda automática: revisa que corresponda.",
+        }
+      : null;
   }
 
   function perfil(entrada) {
@@ -111,9 +179,12 @@
       if (!e) return { ...f, estado: "sin fuente" };
       const p = perfil(e);
       if (p.error) return { ...f, estado: "error", nota: p.error };
-      return { ...f, ...p, estado: e.estado, nota: e.nota };
+      return { ...f, ...p, estado: e.estado, nota: e.nota, fdc: e.fdc };
     });
   }
+
+  const faltantes = (f) =>
+    f.perfil ? elegidos().filter(([k]) => !(k in f.perfil)) : elegidos();
 
   function leerPegado(texto) {
     return texto
@@ -123,12 +194,16 @@
       .map((l) => {
         const m =
           l.match(/^(.*?)[\t;]+\s*([\d.,]+)/) ||
-          l.match(/^(.*\S)\s+([\d.,]+)\s*%?$/);
+          l.match(/^(.*\S)\s+([\d.,]+)\s*(%|g|kg)?$/i);
         return m ? { nombre: m[1].trim(), pct: leerNumero(m[2]) } : null;
       })
       .filter(
         (f) =>
-          f && f.nombre && f.pct !== null && !/^ingrediente/i.test(f.nombre),
+          f &&
+          f.nombre &&
+          f.pct !== null &&
+          f.pct > 0 &&
+          !/^ingrediente/i.test(f.nombre),
       );
   }
 
@@ -137,22 +212,77 @@
     return `<span class="chip ${c}">${esc(t)}</span>`;
   }
 
+  function pintarComponentes() {
+    $("#componentes").innerHTML = GRUPOS.map(
+      ([nombre, ks]) =>
+        `<fieldset><legend>${nombre}</legend>${ks
+          .map((k) => {
+            const [, n, u] = C.PARAMS.find((p) => p[0] === k);
+            return `<label for="comp-${k}"><input type="checkbox" id="comp-${k}" data-comp="${k}"${st.claves.includes(k) ? " checked" : ""}>${esc(n)} <span class="suave">${u}</span></label>`;
+          })
+          .join("")}</fieldset>`,
+    ).join("");
+    $("#n-componentes").textContent =
+      `${st.claves.length} de ${C.PARAMS.length}`;
+  }
+
+  function cambiarComponentes(claves) {
+    st.claves = C.PARAMS.map((p) => p[0]).filter((k) => claves.includes(k));
+    guardado.escribir("componentes", st.claves);
+    autos.clear();
+    pintarComponentes();
+    pintarLab();
+    recalcular();
+  }
+
   function pintarFormula(fs) {
     const total = fs.reduce((s, f) => s + f.pct, 0);
     const suma = $("#suma");
-    suma.textContent = fs.length ? `Suma: ${num(total, 2)} %` : "";
-    suma.className =
-      "suma " +
-      (fs.length ? (Math.abs(total - 100) < 0.01 ? "ok" : "mal") : "");
-    let h = `<thead><tr><th class="num">#</th><th>Ingrediente</th><th class="num">%</th><th>Estado</th><th>Fuente</th><th></th></tr></thead><tbody>`;
+    const cien = Math.abs(total - 100) < 0.01;
+    suma.textContent = fs.length
+      ? cien
+        ? "Suma: 100 %"
+        : `Suma: ${num(total, 2)} · se lleva a 100 % en proporción`
+      : "";
+    suma.className = "suma " + (fs.length ? (cien ? "ok" : "aviso") : "");
+
+    const auto = fs.filter((f) => f.estado === "automático").length;
+    const sin = fs.filter(
+      (f) => f.estado === "sin fuente" || f.estado === "error",
+    ).length;
+    const incompletos = fs.filter(
+      (f) => f.perfil && faltantes(f).length,
+    ).length;
+    const partes = [];
+    if (auto)
+      partes.push(
+        `${auto} encontrado${auto > 1 ? "s" : ""} automáticamente: revísalo${auto > 1 ? "s" : ""}`,
+      );
+    if (sin)
+      partes.push(
+        `${sin} sin fuente: elígelo${sin > 1 ? "s" : ""} con «Elegir»`,
+      );
+    if (incompletos)
+      partes.push(
+        `${incompletos} sin dato en alguno de los componentes elegidos`,
+      );
+    const aviso = $("#aviso-formula");
+    aviso.hidden = !partes.length;
+    aviso.textContent = partes.join(" · ");
+
+    let h = `<thead><tr><th class="num">#</th><th>Ingrediente</th><th class="num">% en fórmula</th><th>Estado</th><th>Fuente</th><th></th></tr></thead><tbody>`;
     fs.forEach((f, i) => {
+      const faltan = faltantes(f).length;
       const fuente = f.fuente
         ? esc(f.fuente).replace(
             /^(SR Legacy|Foundation) (\d+)/,
             '$1 <span class="id">$2</span>',
-          )
-        : `<span class="suave">${esc(f.nota || "No está en ninguna biblioteca")}</span>`;
-      h += `<tr><td class="num suave">${i + 1}</td><td>${esc(f.nombre)}</td><td class="num">${num(f.pct, 2)}</td><td>${chip(f.estado)}</td><td>${fuente}</td>
+          ) +
+          (faltan
+            ? ` <span class="suave">· sin dato en ${faltan} de ${st.claves.length}</span>`
+            : "")
+        : `<span class="suave">${esc(f.nota || "No se encontró: elige en USDA o carga su ficha en la biblioteca privada")}</span>`;
+      h += `<tr><td class="num suave">${i + 1}</td><td>${esc(f.nombre)}</td><td class="num">${num(total ? (f.pct / total) * 100 : 0, 2)}</td><td>${chip(f.estado)}</td><td>${fuente}</td>
         <td><button class="btn mini" data-elegir="${i}" aria-expanded="${st.abierto === i}">${f.estado === "sin fuente" ? "Elegir" : "Cambiar"}</button></td></tr>`;
       if (st.abierto === i) h += filaPicker(f, i);
     });
@@ -166,10 +296,15 @@
 
   function filaPicker(f, i) {
     const tiene = st.elecciones[C.normalizar(f.nombre)];
+    const aceptar =
+      f.estado === "automático"
+        ? `<button class="btn mini" data-fdc="${f.fdc}">Aceptar la sugerencia</button>`
+        : "";
     return `<tr class="picker"><td colspan="6"><div class="picker-cab">
       <label for="busqueda">Buscar en biblioteca y USDA (español o inglés, o un ID)<input id="busqueda" autocomplete="off" value="${esc(f.nombre)}" data-fila="${i}"></label>
-      ${tiene ? `<button class="btn mini" data-quitar="${i}">Quitar elección</button>` : ""}
+      ${aceptar}${tiene ? `<button class="btn mini" data-quitar="${i}">Quitar elección</button>` : ""}
       <button class="btn mini sec" data-cerrar="1">Cerrar</button></div>
+      <p class="nota">La columna de la derecha dice cuántos de los componentes elegidos trae cada alimento.</p>
       <ul id="candidatos" class="candidatos"></ul></td></tr>`;
   }
 
@@ -186,7 +321,7 @@
           )
           .slice(0, 6)
       : [];
-    const usda = C.buscarUSDA(window.USDA, texto, 15);
+    const usda = B.buscarUSDA(window.USDA, texto, 15, st.claves);
     let h = bib
       .map(
         (e) =>
@@ -196,25 +331,30 @@
     h += usda
       .map(
         (u) =>
-          `<li><button data-fdc="${u.fdc}"><span class="base">${u.base}</span><span>${esc(u.desc)}</span><span class="id">${u.fdc}</span></button></li>`,
+          `<li><button data-fdc="${u.fdc}"><span class="base">${u.base}</span><span>${esc(u.desc)} <span class="id">${u.fdc}</span></span><span class="cob">${cobertura(u.fdc)}</span></button></li>`,
       )
       .join("");
     lista.innerHTML =
       h ||
-      `<li class="suave" style="padding:8px 4px">Sin resultados. Prueba con otra palabra o en inglés.</li>`;
+      `<li class="suave vacio">Sin resultados. Prueba con otra palabra o en inglés.</li>`;
   }
 
   function pintarLab() {
-    $("#lab").innerHTML = LAB_CLAVES.map((k) => {
-      const v = st.lab[k];
-      const txt = C.esNumero(v)
-        ? String(Math.round(v * 1e4) / 1e4).replace(".", ",")
-        : v === "nd"
-          ? "nd"
-          : "";
-      const [, nombre, unidad] = C.PARAMS.find((p) => p[0] === k);
-      return `<label for="lab-${k}">${esc(nombre)} (${unidad})<input id="lab-${k}" data-lab="${k}" inputmode="decimal" value="${txt}" autocomplete="off"><small>${esc(st.origenLab[k] || "")}</small></label>`;
-    }).join("");
+    const ks = LAB_CLAVES.filter((k) => st.claves.includes(k));
+    $("#lab").innerHTML = ks.length
+      ? ks
+          .map((k) => {
+            const v = st.lab[k];
+            const txt = C.esNumero(v)
+              ? String(Math.round(v * 1e4) / 1e4).replace(".", ",")
+              : v === "nd"
+                ? "nd"
+                : "";
+            const [, nombre, unidad] = C.PARAMS.find((p) => p[0] === k);
+            return `<label for="lab-${k}">${esc(nombre)} (${unidad})<input id="lab-${k}" data-lab="${k}" inputmode="decimal" value="${txt}" autocomplete="off"><small>${esc(st.origenLab[k] || "")}</small></label>`;
+          })
+          .join("")
+      : `<p class="nota">Ninguno de los componentes elegidos se mide en el laboratorio.</p>`;
   }
 
   function barra(d) {
@@ -231,32 +371,37 @@
     $("#resumen").textContent = C.esNumero(P.hum)
       ? `Humedad teórica de la mezcla ${num(res.teorico.hum, 2)} % · medida ${num(P.hum, 2)} % · factor de ajuste de sólidos k = ${num(res.kHum, 4)}`
       : "Sin humedad medida: el teórico no se ajusta.";
-    let h = `<thead><tr><th>Parámetro /100 g</th><th class="num">Teórico mezcla</th><th class="num">Ajustado a humedad</th><th class="num">Práctico</th><th class="num">Diferencia</th><th class="num">Fórmula con dato</th></tr></thead><tbody>`;
-    for (const [k, nombre, unidad] of C.PARAMS) {
+    const ps = elegidos();
+    let h = `<thead><tr><th>Componente /100 g</th><th class="num">Teórico mezcla</th><th class="num">Ajustado a humedad</th><th class="num">Práctico</th><th class="num">Diferencia</th><th class="num">Fórmula con dato</th></tr></thead><tbody>`;
+    ps.forEach(([k, nombre, unidad], i) => {
       const p = P[k];
-      const grupo = k === "cho" || k === "col" ? ' class="grp"' : "";
-      h += `<tr${grupo}><td>${esc(nombre)}, ${unidad}</td><td class="num">${num(res.teorico[k], dec(res.teorico[k]))}</td>
+      const corte =
+        i < ps.length - 1 && grupoDe(ps[i + 1][0]) !== grupoDe(k)
+          ? ' class="grp"'
+          : "";
+      h += `<tr${corte}><td>${esc(nombre)}, ${unidad}</td><td class="num">${num(res.teorico[k], dec(res.teorico[k]))}</td>
         <td class="num">${num(res.ajustado[k], dec(res.ajustado[k]))}</td>
         <td class="num">${C.esNumero(p) ? num(p, dec(p)) : p === "nd" ? "nd" : '<span class="suave">—</span>'}</td>
         <td>${k in res.dif ? barra(res.dif[k]) : ""}</td>
-        <td class="num ${res.cubierto[k] < res.total - 0.01 ? "" : "suave"}">${num(res.cubierto[k], 1)} %</td></tr>`;
-    }
-    $("#t-resultado").innerHTML = h + "</tbody>";
+        <td class="num ${res.cubierto[k] < 99.99 ? "" : "suave"}">${num(res.cubierto[k], 1)} %</td></tr>`;
+    });
+    $("#t-resultado").innerHTML = ps.length
+      ? h + "</tbody>"
+      : `<tbody><tr><td class="suave">Elige al menos un componente.</td></tr></tbody>`;
 
     let t = `<thead><tr><th>Ingrediente</th><th class="num">%</th><th>Estado</th><th>Fuente usada</th><th>Completado con</th><th>Sin dato</th></tr></thead><tbody>`;
     for (const f of fs) {
       const comp = (f.complementos || [])
+        .filter((c) => st.claves.includes(c.clave))
         .map(
           (c) =>
             `${esc(C.NOMBRE[c.clave])} ← <span class="id">${c.fdc}</span> <span class="suave">${esc(c.desc.slice(0, 50))}</span>`,
         )
         .join("<br>");
-      const faltan = f.perfil
-        ? C.PARAMS.filter(([k]) => !(k in f.perfil))
-            .map((p) => p[1])
-            .join(", ")
-        : "Todos";
-      t += `<tr><td>${esc(f.nombre)}</td><td class="num">${num(f.pct, 2)}</td><td>${chip(f.estado)}</td>
+      const faltan = faltantes(f)
+        .map((p) => p[1])
+        .join(", ");
+      t += `<tr><td>${esc(f.nombre)}</td><td class="num">${num(res.total ? (f.pct / res.total) * 100 : 0, 2)}</td><td>${chip(f.estado)}</td>
         <td>${esc(f.fuente || "—")}${f.nota ? `<br><span class="suave">${esc(f.nota)}</span>` : ""}</td>
         <td>${comp || '<span class="suave">—</span>'}</td><td class="suave">${esc(faltan || "—")}</td></tr>`;
     }
@@ -290,7 +435,7 @@
     st.origenLab = origen;
     const n = Object.keys(lab).length;
     $("#info-r07").textContent = n
-      ? `${st.r07nombre}: ${n} resultados del consecutivo ${cons}. Los minerales son la transcripción del informe subcontratado.`
+      ? `${st.r07nombre}: ${n} resultados del consecutivo ${cons}.`
       : `${st.r07nombre}: el consecutivo ${cons} no aparece en las hojas de resultados.`;
     pintarLab();
     recalcular();
@@ -307,6 +452,25 @@
     a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 2000);
   }
+
+  $("#componentes").addEventListener("change", (ev) => {
+    const k = ev.target.dataset.comp;
+    if (!k) return;
+    cambiarComponentes(
+      ev.target.checked ? [...st.claves, k] : st.claves.filter((x) => x !== k),
+    );
+  });
+  $("#grupos").addEventListener("click", (ev) => {
+    const g = ev.target.closest("button")?.dataset.grupo;
+    if (g)
+      cambiarComponentes(
+        g === "todos"
+          ? C.PARAMS.map((p) => p[0])
+          : g === "habitual"
+            ? HABITUAL
+            : [],
+      );
+  });
 
   $("#leer").addEventListener("click", () => {
     st.formula = leerPegado($("#pegado").value);
@@ -440,6 +604,7 @@
         filas: fs,
         res,
         origenLab: st.origenLab,
+        claves: st.claves,
       });
       descargar(
         `${cons || "formulacion"}_calculo_TN.xlsx`,
@@ -456,6 +621,7 @@
   $("#pegado").value = EJEMPLO;
   st.formula = leerPegado(EJEMPLO);
   $("#aviso-ejemplo").hidden = false;
+  pintarComponentes();
   pintarLab();
   recalcular();
 })();

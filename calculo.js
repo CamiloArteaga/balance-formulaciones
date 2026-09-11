@@ -145,20 +145,21 @@
     };
   }
 
+  // Las cantidades pueden venir en %, g o kg: todo se refiere al total de la fórmula.
   function calcular(filas, lab) {
+    const total = filas.reduce((s, f) => s + f.pct, 0);
     const teorico = {},
       cubierto = {};
     for (const [k] of PARAMS) {
       teorico[k] = 0;
       cubierto[k] = 0;
       for (const f of filas) {
-        if (f.perfil && k in f.perfil) {
-          teorico[k] += (f.pct * f.perfil[k]) / 100;
-          cubierto[k] += f.pct;
+        if (f.perfil && k in f.perfil && total > 0) {
+          teorico[k] += (f.pct * f.perfil[k]) / total;
+          cubierto[k] += (f.pct / total) * 100;
         }
       }
     }
-    const total = filas.reduce((s, f) => s + f.pct, 0);
     const kHum = esNumero(lab.hum) ? (100 - lab.hum) / (100 - teorico.hum) : 1;
     const ajustado = {};
     for (const [k] of PARAMS)
@@ -261,126 +262,6 @@
     return { lab, origen };
   }
 
-  const ES_EN = {
-    pollo: "chicken",
-    gallina: "chicken",
-    cerdo: "pork",
-    res: "beef",
-    carne: "meat",
-    ternera: "veal",
-    pavo: "turkey",
-    pescado: "fish",
-    atun: "tuna",
-    salmon: "salmon",
-    huevo: "egg",
-    leche: "milk",
-    queso: "cheese",
-    crema: "cream",
-    mantequilla: "butter",
-    yogur: "yogurt",
-    suero: "whey",
-    sal: "salt",
-    azucar: "sugar",
-    miel: "honey",
-    harina: "flour",
-    trigo: "wheat",
-    maiz: "corn",
-    arroz: "rice",
-    avena: "oats",
-    almidon: "starch",
-    yuca: "cassava",
-    tapioca: "tapioca",
-    papa: "potato",
-    ajo: "garlic",
-    cebolla: "onion",
-    puerro: "leeks",
-    tomate: "tomato",
-    zanahoria: "carrot",
-    pimienta: "pepper",
-    pimenton: "paprika",
-    comino: "cumin",
-    oregano: "oregano",
-    aceite: "oil",
-    grasa: "fat",
-    soya: "soy",
-    soja: "soy",
-    proteina: "protein",
-    concentrado: "concentrate",
-    aislado: "isolate",
-    polvo: "powder",
-    seco: "dried",
-    seca: "dried",
-    crudo: "raw",
-    cruda: "raw",
-    magra: "lean",
-    magro: "lean",
-    piel: "skin",
-    higado: "liver",
-    cacao: "cocoa",
-    cafe: "coffee",
-    mango: "mango",
-    ahuyama: "squash",
-    calabaza: "pumpkin",
-    frijol: "beans",
-    lenteja: "lentils",
-    garbanzo: "chickpeas",
-    mani: "peanuts",
-    coco: "coconut",
-    platano: "plantains",
-    banano: "bananas",
-    naranja: "orange",
-    limon: "lemon",
-    fresa: "strawberries",
-    mora: "blackberries",
-    pina: "pineapple",
-    agua: "water",
-    vinagre: "vinegar",
-    mostaza: "mustard",
-    canela: "cinnamon",
-    clavo: "cloves",
-    jengibre: "ginger",
-    perejil: "parsley",
-    cilantro: "coriander",
-    apio: "celery",
-    pimiento: "peppers",
-    champinon: "mushrooms",
-    almendra: "almonds",
-    gelatina: "gelatin",
-    sangre: "blood",
-  };
-
-  function traducir(t) {
-    if (ES_EN[t]) return ES_EN[t];
-    if (t.endsWith("es") && ES_EN[t.slice(0, -2)]) return ES_EN[t.slice(0, -2)];
-    if (t.endsWith("s") && ES_EN[t.slice(0, -1)]) return ES_EN[t.slice(0, -1)];
-    return t;
-  }
-
-  function buscarUSDA(usda, texto, limite = 12) {
-    const terminos = normalizar(texto)
-      .split(/[^a-z0-9]+/)
-      .filter((t) => t.length > 1)
-      .map(traducir);
-    if (!terminos.length) return [];
-    const res = [];
-    for (const [fdc, a] of Object.entries(usda.alimentos)) {
-      if (/^\d+$/.test(terminos[0]) && fdc === terminos[0])
-        return [{ fdc, desc: a[0], base: a[2], aciertos: 99 }];
-      const w = a[0].toLowerCase().match(/[a-z]+/g) || [];
-      const aciertos = terminos.filter((t) =>
-        w.some((x) => x.startsWith(t)),
-      ).length;
-      if (aciertos === terminos.length)
-        res.push({ fdc, desc: a[0], base: a[2], aciertos });
-    }
-    res.sort(
-      (x, y) =>
-        (x.base === y.base ? 0 : x.base === "Foundation" ? -1 : 1) ||
-        x.desc.length - y.desc.length,
-    );
-    return res.slice(0, limite);
-  }
-
   const api = {
     PARAMS,
     NOMBRE,
@@ -391,7 +272,6 @@
     perfilDeEntrada,
     calcular,
     leerR07,
-    buscarUSDA,
     esNumero,
   };
   if (typeof module !== "undefined" && module.exports) module.exports = api;

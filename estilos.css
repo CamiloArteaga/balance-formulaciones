@@ -153,6 +153,12 @@ section > h2,
   border: 0;
   padding: 0;
 }
+.contador {
+  font: 500 12px/1 var(--mono);
+  color: var(--ink-soft);
+  letter-spacing: 0.04em;
+  vertical-align: middle;
+}
 .dos {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -169,14 +175,15 @@ section > h2,
 }
 .ayuda {
   color: var(--ink-soft);
-  max-width: 75ch;
+  max-width: 80ch;
 }
 .nota {
   color: var(--ink-soft);
   font-size: 13.5px;
-  max-width: 70ch;
+  max-width: 75ch;
 }
-.ejemplo {
+.ejemplo,
+.aviso {
   background: var(--warn-wash);
   color: var(--warn);
   padding: 8px 12px;
@@ -197,7 +204,6 @@ label {
   text-transform: uppercase;
   color: var(--ink-soft);
 }
-input[type="text"],
 input:not([type]),
 input[type="number"],
 textarea {
@@ -225,6 +231,47 @@ textarea {
   .pegar {
     grid-template-columns: 1fr;
   }
+}
+
+.componentes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 12px;
+}
+.componentes fieldset {
+  margin: 0;
+  padding: 10px 12px 12px;
+  border: 1px solid var(--hair);
+  background: var(--paper);
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.componentes legend {
+  padding: 0 4px;
+  font: 600 11px/1.2 var(--mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.componentes label {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  font: 400 14px/1.3 var(--body);
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--ink);
+  cursor: pointer;
+}
+.componentes input {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: var(--accent);
+}
+.componentes .suave {
+  font-size: 12px;
 }
 
 .btn {
@@ -274,9 +321,9 @@ textarea {
   background: var(--ok-wash);
   color: var(--ok);
 }
-.suma.mal {
-  background: var(--crit-wash);
-  color: var(--crit);
+.suma.aviso {
+  background: var(--warn-wash);
+  color: var(--warn);
 }
 
 .tbl {
@@ -366,9 +413,12 @@ tr.picker > td {
 .picker-cab label {
   flex: 1 1 260px;
 }
+tr.picker .nota {
+  margin-top: 8px;
+}
 .candidatos {
   list-style: none;
-  margin: 10px 0 0;
+  margin: 8px 0 0;
   padding: 0;
   display: flex;
   flex-direction: column;
@@ -378,6 +428,9 @@ tr.picker > td {
 }
 .candidatos li {
   border-bottom: 1px solid var(--hair);
+}
+.candidatos .vacio {
+  padding: 8px 4px;
 }
 .candidatos button {
   all: unset;
@@ -394,7 +447,8 @@ tr.picker > td {
 .candidatos button:focus-visible {
   background: var(--accent-wash);
 }
-.candidatos .base {
+.candidatos .base,
+.candidatos .cob {
   font: 500 11px/1.6 var(--mono);
   color: var(--ink-soft);
 }

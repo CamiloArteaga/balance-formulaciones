@@ -56,13 +56,33 @@
 
       <section>
         <div class="tit">
+          <h2>Componentes <span id="n-componentes" class="contador"></span></h2>
+          <div id="grupos" class="acciones">
+            <button class="btn mini sec" data-grupo="habitual">
+              Lo habitual
+            </button>
+            <button class="btn mini sec" data-grupo="todos">Todos</button>
+            <button class="btn mini sec" data-grupo="ninguno">Ninguno</button>
+          </div>
+        </div>
+        <p class="ayuda">
+          Marca solo lo que necesitas: la búsqueda prefiere alimentos con esos
+          datos, y el resultado y el Excel muestran solo esos componentes. La
+          hoja «Cálculo TN» conserva siempre sus columnas.
+        </p>
+        <div id="componentes" class="componentes"></div>
+      </section>
+
+      <section>
+        <div class="tit">
           <h2>Formulación</h2>
           <span id="suma" class="suma"></span>
         </div>
         <p class="ayuda">
-          Pega desde Excel dos columnas: ingrediente y porcentaje. Cada fila
-          busca primero en tu biblioteca privada, luego en la pública; si no
-          encuentra, eliges en USDA.
+          Pega desde Excel dos columnas: ingrediente y cantidad (%, g o kg; se
+          lleva a 100 % en proporción). Cada ingrediente se busca primero en tu
+          biblioteca privada, luego en la pública y, si no está, en USDA de
+          forma automática.
         </p>
         <div class="pegar">
           <label for="pegado" class="oculto">Formulación</label>
@@ -73,6 +93,7 @@
           Ejemplo genérico cargado para mostrar la herramienta. Pega tu
           formulación y pulsa «Leer formulación».
         </p>
+        <p id="aviso-formula" class="aviso" hidden></p>
         <div class="tbl"><table id="t-formula"></table></div>
       </section>
 
@@ -96,8 +117,8 @@
             <button id="quitar-privada" class="btn sec">Quitar</button>
           </div>
           <p class="nota">
-            La biblioteca privada lleva las fichas técnicas y los nombres
-            comerciales. Queda guardada solo en este navegador.
+            La biblioteca privada lleva las fichas técnicas, los nombres
+            comerciales y tus elecciones. Queda guardada solo en este navegador.
           </p>
         </div>
         <div>
@@ -150,6 +171,7 @@
     <script src="datos/usda.js"></script>
     <script src="datos/biblioteca.js"></script>
     <script src="calculo.js"></script>
+    <script src="busqueda.js"></script>
     <script src="excel.js"></script>
     <script src="app.js"></script>
   </body>
