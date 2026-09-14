@@ -59,7 +59,7 @@ body {
   margin: 0;
   background: var(--ground);
   color: var(--ink);
-  font: 400 15px/1.5 var(--body);
+  font: 400 16px/1.6 var(--body);
   padding-inline: 20px;
   padding-block: 0 56px;
 }
@@ -125,6 +125,10 @@ textarea {
   font: 500 12px/1.4 var(--mono);
   letter-spacing: 0.04em;
 }
+.pasos {
+  font: 500 13.5px/1.4 var(--body);
+  margin-top: 4px;
+}
 main {
   max-width: 1120px;
   margin: 0 auto;
@@ -179,7 +183,7 @@ section > h2,
 }
 .nota {
   color: var(--ink-soft);
-  font-size: 13.5px;
+  font-size: 14.5px;
   max-width: 75ch;
 }
 .ejemplo,
@@ -188,6 +192,28 @@ section > h2,
   color: var(--warn);
   padding: 8px 12px;
   font-size: 14px;
+}
+.aviso {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+#detalle-componentes summary {
+  cursor: pointer;
+  width: fit-content;
+  font: 600 12px/1.3 var(--mono);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--accent);
+  padding: 4px 0;
+}
+#detalle-componentes summary:hover {
+  text-decoration: underline;
+}
+#detalle-componentes[open] summary {
+  margin-bottom: 8px;
 }
 
 .campos {
@@ -210,12 +236,13 @@ textarea {
   background: var(--paper);
   border: 1px solid var(--hair);
   border-bottom: 2px solid var(--rule);
-  padding: 7px 9px;
-  font: 400 15px/1.4 var(--body);
+  padding: 11px 12px;
+  font: 400 16px/1.4 var(--body);
   text-transform: none;
   letter-spacing: 0;
   color: var(--ink);
   width: 100%;
+  min-height: 44px;
 }
 textarea {
   font: 400 13.5px/1.5 var(--mono);
@@ -245,7 +272,7 @@ textarea {
   background: var(--paper);
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 2px;
 }
 .componentes legend {
   padding: 0 4px;
@@ -257,17 +284,19 @@ textarea {
 .componentes label {
   flex-direction: row;
   align-items: center;
-  gap: 8px;
-  font: 400 14px/1.3 var(--body);
+  gap: 10px;
+  padding-block: 6px;
+  font: 400 15px/1.3 var(--body);
   text-transform: none;
   letter-spacing: 0;
   color: var(--ink);
   cursor: pointer;
 }
 .componentes input {
-  width: 16px;
-  height: 16px;
+  width: 20px;
+  height: 20px;
   margin: 0;
+  flex: none;
   accent-color: var(--accent);
 }
 .componentes .suave {
@@ -282,8 +311,9 @@ textarea {
   cursor: pointer;
   background: var(--paper);
   border: 2px solid var(--rule);
-  padding: 7px 14px;
-  font: 700 14px/1.2 var(--body);
+  padding: 10px 16px;
+  min-height: 44px;
+  font: 700 14.5px/1.2 var(--body);
   text-transform: none;
   letter-spacing: 0;
   color: var(--ink);
@@ -304,8 +334,9 @@ textarea {
   border-color: var(--accent);
 }
 .btn.mini {
-  padding: 3px 9px;
-  font-size: 13px;
+  padding: 6px 12px;
+  min-height: 36px;
+  font-size: 13.5px;
   border-width: 1px;
 }
 .acciones {
@@ -328,6 +359,7 @@ textarea {
 
 .tbl {
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   border-top: 3px solid var(--rule);
   border-bottom: 1px solid var(--rule);
 }
@@ -337,23 +369,86 @@ textarea {
 table {
   border-collapse: collapse;
   width: 100%;
-  font-size: 14px;
-  line-height: 1.4;
+  font-size: 14.5px;
+  line-height: 1.5;
 }
 th,
 td {
   text-align: left;
-  padding: 7px 10px 7px 0;
+  padding: 10px 14px 10px 0;
   vertical-align: top;
   border-bottom: 1px solid var(--hair);
 }
 th {
-  font: 600 11px/1.3 var(--mono);
+  font: 600 11.5px/1.3 var(--mono);
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--ink-soft);
   border-bottom: 1px solid var(--rule);
   white-space: nowrap;
+}
+.tbl table th:first-child,
+.tbl table td:first-child {
+  position: sticky;
+  left: 0;
+  background: var(--ground);
+  padding-left: 2px;
+}
+.label .tbl table th:first-child,
+.label .tbl table td:first-child {
+  background: var(--paper);
+}
+
+@media (max-width: 640px) {
+  .tbl table thead {
+    display: none;
+  }
+  .tbl table,
+  .tbl table tbody,
+  .tbl table tr {
+    display: block;
+    width: 100%;
+  }
+  .tbl table tr {
+    border-bottom: 2px solid var(--rule);
+    padding-block: 2px 12px;
+  }
+  .tbl table tr:last-child {
+    border-bottom: 0;
+  }
+  .tbl table tr.grp {
+    border-bottom: 2px solid var(--rule);
+  }
+  .tbl table td {
+    display: block;
+    position: static;
+    width: auto;
+    padding: 4px 0;
+    border-bottom: 0;
+  }
+  .tbl table td.col-indice {
+    display: none;
+  }
+  .tbl table td.card-tit {
+    font: 700 15.5px/1.3 var(--body);
+    padding-top: 12px;
+    padding-bottom: 2px;
+  }
+  .tbl table td[data-label]::before {
+    content: attr(data-label);
+    display: block;
+    color: var(--ink-soft);
+    font: 600 10.5px/1.3 var(--mono);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 2px;
+  }
+  .tbl table td.num {
+    text-align: left;
+  }
+  tr.picker > td {
+    padding: 12px 0;
+  }
 }
 td.num,
 th.num {
@@ -440,8 +535,16 @@ tr.picker .nota {
   grid-template-columns: 90px 1fr auto;
   gap: 10px;
   width: 100%;
-  padding: 7px 4px;
-  font-size: 14px;
+  padding: 11px 6px;
+  min-height: 44px;
+  align-items: center;
+  font-size: 14.5px;
+}
+@media (max-width: 560px) {
+  .candidatos button {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
 }
 .candidatos button:hover,
 .candidatos button:focus-visible {
@@ -575,5 +678,12 @@ footer {
   }
   h1 {
     font-size: 26px;
+  }
+  main {
+    gap: 28px;
+  }
+  th,
+  td {
+    padding: 9px 12px 9px 0;
   }
 }

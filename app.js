@@ -268,7 +268,14 @@
       );
     const aviso = $("#aviso-formula");
     aviso.hidden = !partes.length;
-    aviso.textContent = partes.join(" · ");
+    $("#texto-aviso-formula").textContent = partes.join(" · ");
+    const pendiente = fs.findIndex(
+      (f) =>
+        f.estado === "automático" ||
+        f.estado === "sin fuente" ||
+        f.estado === "error",
+    );
+    $("#ir-pendiente").hidden = pendiente === -1;
 
     let h = `<thead><tr><th class="num">#</th><th>Ingrediente</th><th class="num">% en fórmula</th><th>Estado</th><th>Fuente</th><th></th></tr></thead><tbody>`;
     fs.forEach((f, i) => {
@@ -282,7 +289,7 @@
             ? ` <span class="suave">· sin dato en ${faltan} de ${st.claves.length}</span>`
             : "")
         : `<span class="suave">${esc(f.nota || "No se encontró: elige en USDA o carga su ficha en la biblioteca privada")}</span>`;
-      h += `<tr><td class="num suave">${i + 1}</td><td>${esc(f.nombre)}</td><td class="num">${num(total ? (f.pct / total) * 100 : 0, 2)}</td><td>${chip(f.estado)}</td><td>${fuente}</td>
+      h += `<tr><td class="num suave col-indice">${i + 1}</td><td class="card-tit" data-label="Ingrediente">${esc(f.nombre)}</td><td class="num" data-label="% en fórmula">${num(total ? (f.pct / total) * 100 : 0, 2)}</td><td data-label="Estado">${chip(f.estado)}</td><td data-label="Fuente">${fuente}</td>
         <td><button class="btn mini" data-elegir="${i}" aria-expanded="${st.abierto === i}">${f.estado === "sin fuente" ? "Elegir" : "Cambiar"}</button></td></tr>`;
       if (st.abierto === i) h += filaPicker(f, i);
     });
@@ -379,11 +386,11 @@
         i < ps.length - 1 && grupoDe(ps[i + 1][0]) !== grupoDe(k)
           ? ' class="grp"'
           : "";
-      h += `<tr${corte}><td>${esc(nombre)}, ${unidad}</td><td class="num">${num(res.teorico[k], dec(res.teorico[k]))}</td>
-        <td class="num">${num(res.ajustado[k], dec(res.ajustado[k]))}</td>
-        <td class="num">${C.esNumero(p) ? num(p, dec(p)) : p === "nd" ? "nd" : '<span class="suave">—</span>'}</td>
-        <td>${k in res.dif ? barra(res.dif[k]) : ""}</td>
-        <td class="num ${res.cubierto[k] < 99.99 ? "" : "suave"}">${num(res.cubierto[k], 1)} %</td></tr>`;
+      h += `<tr${corte}><td class="card-tit">${esc(nombre)}, ${unidad}</td><td class="num" data-label="Teórico mezcla">${num(res.teorico[k], dec(res.teorico[k]))}</td>
+        <td class="num" data-label="Ajustado a humedad">${num(res.ajustado[k], dec(res.ajustado[k]))}</td>
+        <td class="num" data-label="Práctico">${C.esNumero(p) ? num(p, dec(p)) : p === "nd" ? "nd" : '<span class="suave">—</span>'}</td>
+        <td data-label="Diferencia">${k in res.dif ? barra(res.dif[k]) : ""}</td>
+        <td class="num ${res.cubierto[k] < 99.99 ? "" : "suave"}" data-label="Fórmula con dato">${num(res.cubierto[k], 1)} %</td></tr>`;
     });
     $("#t-resultado").innerHTML = ps.length
       ? h + "</tbody>"
@@ -401,9 +408,9 @@
       const faltan = faltantes(f)
         .map((p) => p[1])
         .join(", ");
-      t += `<tr><td>${esc(f.nombre)}</td><td class="num">${num(res.total ? (f.pct / res.total) * 100 : 0, 2)}</td><td>${chip(f.estado)}</td>
-        <td>${esc(f.fuente || "—")}${f.nota ? `<br><span class="suave">${esc(f.nota)}</span>` : ""}</td>
-        <td>${comp || '<span class="suave">—</span>'}</td><td class="suave">${esc(faltan || "—")}</td></tr>`;
+      t += `<tr><td class="card-tit">${esc(f.nombre)}</td><td class="num" data-label="%">${num(res.total ? (f.pct / res.total) * 100 : 0, 2)}</td><td data-label="Estado">${chip(f.estado)}</td>
+        <td data-label="Fuente usada">${esc(f.fuente || "—")}${f.nota ? `<br><span class="suave">${esc(f.nota)}</span>` : ""}</td>
+        <td data-label="Completado con">${comp || '<span class="suave">—</span>'}</td><td class="suave" data-label="Sin dato">${esc(faltan || "—")}</td></tr>`;
     }
     $("#t-fuentes").innerHTML = t + "</tbody>";
   }
@@ -477,6 +484,22 @@
     st.abierto = null;
     $("#aviso-ejemplo").hidden = true;
     recalcular();
+  });
+
+  $("#ir-pendiente").addEventListener("click", () => {
+    const i = filas().findIndex(
+      (f) =>
+        f.estado === "automático" ||
+        f.estado === "sin fuente" ||
+        f.estado === "error",
+    );
+    if (i === -1) return;
+    st.abierto = i;
+    recalcular();
+    $("#t-formula tr.picker")?.scrollIntoView({
+      behavior: "smooth",
+      block: "center",
+    });
   });
 
   $("#t-formula").addEventListener("click", (ev) => {

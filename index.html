@@ -20,6 +20,10 @@
           Perfil teórico por composición con USDA FoodData Central, frente al
           resultado del laboratorio.
         </p>
+        <p class="pasos">
+          1. Pega tu fórmula → 2. Revisa las fuentes propuestas → 3. Compara
+          contra tu laboratorio y descarga el Excel.
+        </p>
       </div>
       <p class="privacidad">
         Todo se calcula en este navegador. Nada se envía a ningún servidor.
@@ -65,12 +69,15 @@
             <button class="btn mini sec" data-grupo="ninguno">Ninguno</button>
           </div>
         </div>
-        <p class="ayuda">
-          Marca solo lo que necesitas: la búsqueda prefiere alimentos con esos
-          datos, y el resultado y el Excel muestran solo esos componentes. La
-          hoja «Cálculo TN» conserva siempre sus columnas.
-        </p>
-        <div id="componentes" class="componentes"></div>
+        <details id="detalle-componentes">
+          <summary>Personalizar componentes</summary>
+          <p class="ayuda">
+            Marca solo lo que necesitas: la búsqueda prefiere alimentos con esos
+            datos, y el resultado y el Excel muestran solo esos componentes. La
+            hoja «Cálculo TN» conserva siempre sus columnas.
+          </p>
+          <div id="componentes" class="componentes"></div>
+        </details>
       </section>
 
       <section>
@@ -93,7 +100,12 @@
           Ejemplo genérico cargado para mostrar la herramienta. Pega tu
           formulación y pulsa «Leer formulación».
         </p>
-        <p id="aviso-formula" class="aviso" hidden></p>
+        <p id="aviso-formula" class="aviso" hidden>
+          <span id="texto-aviso-formula"></span>
+          <button id="ir-pendiente" class="btn mini" hidden>
+            Revisar el primer pendiente
+          </button>
+        </p>
         <div class="tbl"><table id="t-formula"></table></div>
       </section>
 
