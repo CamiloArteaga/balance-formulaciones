@@ -42,6 +42,18 @@
     );
   const esNumero = (v) => typeof v === "number" && isFinite(v);
 
+  // Fracción de masa de 1 unidad de cada magnitud sobre 100 g de producto.
+  const FRACCION_UNIDAD = { g: 1 / 100, mg: 1 / 1e5, µg: 1 / 1e8 };
+
+  // PRSD de Horwitz modificado (Thompson, 2000): satura en 22 % por debajo
+  // de 1,2e-7 (120 ppb), donde la ecuación original diverge sin respaldo
+  // empírico. C es fracción de masa (1 = 100 %).
+  function prsdHorwitz(c) {
+    if (!(c > 0)) return null;
+    if (c < 1.2e-7) return 22;
+    return Math.pow(2, 1 - 0.5 * Math.log10(c));
+  }
+
   function perfilUSDA(usda, fid) {
     const a = usda.alimentos[fid];
     if (!a) return null;
@@ -174,7 +186,19 @@
       if (esNumero(practico[k]) && practico[k] !== 0)
         dif[k] = ((ajustado[k] - practico[k]) / practico[k]) * 100;
     }
-    return { teorico, cubierto, total, kHum, ajustado, practico, dif };
+    // Z de Horwitz: la diferencia % ya es una desviación relativa, así que
+    // se compara directo contra el PRSD_H (también en %) a la concentración
+    // práctica. |Z|≤2 aceptable, 2-3 cuestionable, ≥3 no aceptable — misma
+    // convención que un z-score de ensayo de aptitud (ISO 13528 / CAC/GL 27).
+    const horwitz = {};
+    for (const [k, , unidad] of PARAMS) {
+      if (!(k in dif)) continue;
+      const c = practico[k] * FRACCION_UNIDAD[unidad];
+      const prsd = prsdHorwitz(c);
+      if (prsd == null) continue;
+      horwitz[k] = { c, prsd, z: dif[k] / prsd };
+    }
+    return { teorico, cubierto, total, kHum, ajustado, practico, dif, horwitz };
   }
 
   const HOJAS_R07 = [

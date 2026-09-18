@@ -364,13 +364,27 @@
       : `<p class="nota">Ninguno de los componentes elegidos se mide en el laboratorio.</p>`;
   }
 
-  function barra(d) {
+  function barra(d, horw) {
+    const z = horw ? Math.abs(horw.z) : null;
     const clase =
-      Math.abs(d) <= 10 ? "v-ok" : Math.abs(d) <= 25 ? "v-warn" : "v-crit";
+      z == null
+        ? Math.abs(d) <= 10
+          ? "v-ok"
+          : Math.abs(d) <= 25
+            ? "v-warn"
+            : "v-crit"
+        : z <= 2
+          ? "v-ok"
+          : z < 3
+            ? "v-warn"
+            : "v-crit";
     const w = Math.min(Math.abs(d), 100) / 2;
     const izq = d < 0 ? 50 - w : 50;
     const signo = d > 0 ? "+" : d < 0 ? "−" : "";
-    return `<div class="dev ${clase}"><span class="bar"><i style="left:${izq}%;width:${w}%"></i></span><span class="pct">${signo}${num(Math.abs(d), 1)} %</span></div>`;
+    const tit = horw
+      ? ` title="Z de Horwitz: ${num(horw.z, 2)} (PRSD_H ${num(horw.prsd, 1)} % a esta concentración)"`
+      : "";
+    return `<div class="dev ${clase}"${tit}><span class="bar"><i style="left:${izq}%;width:${w}%"></i></span><span class="pct">${signo}${num(Math.abs(d), 1)} %</span></div>`;
   }
 
   function pintarResultado(fs, res) {
@@ -389,7 +403,7 @@
       h += `<tr${corte}><td class="card-tit">${esc(nombre)}, ${unidad}</td><td class="num" data-label="Teórico mezcla">${num(res.teorico[k], dec(res.teorico[k]))}</td>
         <td class="num" data-label="Ajustado a humedad">${num(res.ajustado[k], dec(res.ajustado[k]))}</td>
         <td class="num" data-label="Práctico">${C.esNumero(p) ? num(p, dec(p)) : p === "nd" ? "nd" : '<span class="suave">—</span>'}</td>
-        <td data-label="Diferencia">${k in res.dif ? barra(res.dif[k]) : ""}</td>
+        <td data-label="Diferencia">${k in res.dif ? barra(res.dif[k], res.horwitz[k]) : ""}</td>
         <td class="num ${res.cubierto[k] < 99.99 ? "" : "suave"}" data-label="Fórmula con dato">${num(res.cubierto[k], 1)} %</td></tr>`;
     });
     $("#t-resultado").innerHTML = ps.length

@@ -245,12 +245,17 @@
         "Teórico ajustado a humedad",
         "Práctico (laboratorio)",
         "Diferencia (%)",
+        "PRSD Horwitz (%)",
+        "Z Horwitz",
+        "Criterio Horwitz",
         "% de la fórmula con dato",
         "Origen del dato práctico",
       ]),
     );
     for (const [k, nombre, unidad] of elegidos(ctx, C)) {
       const p = res.practico[k];
+      const h = res.horwitz[k];
+      const az = h ? Math.abs(h.z) : null;
       ws.addRow([
         nombre,
         unidad,
@@ -258,6 +263,15 @@
         r4(res.ajustado[k]),
         C.esNumero(p) ? r4(p) : p === "nd" ? "nd" : "sin dato",
         k in res.dif ? Math.round(res.dif[k] * 10) / 10 : "",
+        h ? r2(h.prsd) : "",
+        h ? Math.round(h.z * 100) / 100 : "",
+        az == null
+          ? ""
+          : az <= 2
+            ? "Aceptable"
+            : az < 3
+              ? "Cuestionable"
+              : "No aceptable",
         r2(res.cubierto[k]),
         k === "cho" && C.esNumero(p)
           ? "100 − (humedad + proteína + grasa + cenizas)"
