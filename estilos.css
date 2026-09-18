@@ -586,9 +586,17 @@ tr.picker .nota {
 }
 .dev {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 8px;
   justify-content: flex-end;
+}
+.z {
+  flex-basis: 100%;
+  text-align: right;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-soft);
 }
 .bar {
   position: relative;

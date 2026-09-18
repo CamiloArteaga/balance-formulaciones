@@ -384,7 +384,10 @@
     const tit = horw
       ? ` title="Z de Horwitz: ${num(horw.z, 2)} (PRSD_H ${num(horw.prsd, 1)} % a esta concentración)"`
       : "";
-    return `<div class="dev ${clase}"${tit}><span class="bar"><i style="left:${izq}%;width:${w}%"></i></span><span class="pct">${signo}${num(Math.abs(d), 1)} %</span></div>`;
+    const zTxt = horw
+      ? `<span class="z">Z Horwitz ${horw.z > 0 ? "+" : horw.z < 0 ? "−" : ""}${num(Math.abs(horw.z), 1)}</span>`
+      : "";
+    return `<div class="dev ${clase}"${tit}><span class="bar"><i style="left:${izq}%;width:${w}%"></i></span><span class="pct">${signo}${num(Math.abs(d), 1)} %</span>${zTxt}</div>`;
   }
 
   function pintarResultado(fs, res) {
