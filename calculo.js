@@ -74,11 +74,21 @@
       perfil.n = perfil.prot / fn;
       origen.n = `${fid}: proteína ÷ ${fn}`;
     }
-    if (!("aza" in perfil)) {
-      perfil.aza = 0;
-      origen.aza = "0: sin azúcar añadido";
-    }
     return { perfil, origen, desc, base };
+  }
+
+  // "Azúcares añadidos" no es un dato de ninguna base: depende de si TÚ
+  // agregaste ese ingrediente como edulcorante. Igual que en el Cálculo TN
+  // oficial (columna "azucares añad"), un ingrediente marcado como azúcar
+  // añadida aporta el 100 % de su azúcar total; el resto aporta 0.
+  function aplicarAzucarAnadida(entrada, perfil, origen) {
+    if (entrada.azucarAnadida && esNumero(perfil.azt)) {
+      perfil.aza = perfil.azt;
+      origen.aza = "= azúcares totales (marcado como azúcar añadida)";
+    } else if (!("aza" in perfil)) {
+      perfil.aza = 0;
+      origen.aza = "0: no marcado como azúcar añadida";
+    }
   }
 
   function complementar(usda, fid, perfil, origen) {
@@ -140,6 +150,7 @@
       const origen = Object.fromEntries(
         Object.keys(perfil).map((k) => [k, entrada.ref]),
       );
+      aplicarAzucarAnadida(entrada, perfil, origen);
       return {
         perfil,
         origen,
@@ -152,6 +163,7 @@
     if (!p)
       return { error: `El ID ${entrada.fdc} no está en la base local de USDA` };
     const complementos = complementar(usda, entrada.fdc, p.perfil, p.origen);
+    aplicarAzucarAnadida(entrada, p.perfil, p.origen);
     return {
       perfil: p.perfil,
       origen: p.origen,
