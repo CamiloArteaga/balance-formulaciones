@@ -10,7 +10,7 @@
     ["trans", "Grasa trans", "mg"],
     ["azt", "Azúcares totales", "g"],
     ["aza", "Azúcares añadidos", "g"],
-    ["fib", "Fibra dietaria", "g"],
+    ["fib", "Fibra total", "g"],
     ["cen", "Cenizas", "g"],
     ["cho", "Carbohidratos totales", "g"],
     ["vita", "Vitamina A", "µg"],
@@ -44,6 +44,10 @@
 
   // Fracción de masa de 1 unidad de cada magnitud sobre 100 g de producto.
   const FRACCION_UNIDAD = { g: 1 / 100, mg: 1 / 1e5, µg: 1 / 1e8 };
+
+  // Sat/trans son fracción de la grasa total, y vit A/D son liposolubles:
+  // se ajustan a la grasa práctica en vez de a la humedad.
+  const POR_GRASA = new Set(["sat", "trans", "vita", "vitd"]);
 
   // PRSD de Horwitz modificado (Thompson, 2000): satura en 22 % por debajo
   // de 1,2e-7 (120 ppb), donde la ecuación original diverge sin respaldo
@@ -173,10 +177,14 @@
       }
     }
     const kHum = esNumero(lab.hum) ? (100 - lab.hum) / (100 - teorico.hum) : 1;
+    const kGrasa =
+      esNumero(lab.grasa) && teorico.grasa > 0 ? lab.grasa / teorico.grasa : 1;
     const ajustado = {};
     for (const [k] of PARAMS)
       ajustado[k] =
-        k === "hum" && esNumero(lab.hum) ? lab.hum : teorico[k] * kHum;
+        k === "hum" && esNumero(lab.hum)
+          ? lab.hum
+          : teorico[k] * (POR_GRASA.has(k) ? kGrasa : kHum);
     const practico = { ...lab };
     if (["hum", "prot", "grasa", "cen"].every((k) => esNumero(lab[k]))) {
       practico.cho = 100 - (lab.hum + lab.prot + lab.grasa + lab.cen);
@@ -198,7 +206,17 @@
       if (prsd == null) continue;
       horwitz[k] = { c, prsd, z: dif[k] / prsd };
     }
-    return { teorico, cubierto, total, kHum, ajustado, practico, dif, horwitz };
+    return {
+      teorico,
+      cubierto,
+      total,
+      kHum,
+      kGrasa,
+      ajustado,
+      practico,
+      dif,
+      horwitz,
+    };
   }
 
   const HOJAS_R07 = [
@@ -289,6 +307,7 @@
   const api = {
     PARAMS,
     NOMBRE,
+    POR_GRASA,
     normalizar,
     perfilUSDA,
     complementar,

@@ -233,8 +233,13 @@
     ]).font = NEGRITA;
     ws.addRow([
       C.esNumero(res.practico.hum)
-        ? `Humedad teórica de la mezcla: ${res.teorico.hum.toFixed(2)} % · humedad medida: ${res.practico.hum.toFixed(2)} % · factor de ajuste de sólidos: ${res.kHum.toFixed(4)}`
-        : "Sin humedad medida: el teórico no se ajustó.",
+        ? `Humedad teórica de la mezcla: ${res.teorico.hum.toFixed(2)} % · humedad medida: ${res.practico.hum.toFixed(2)} % · factor de ajuste por humedad: ${res.kHum.toFixed(4)}`
+        : "Sin humedad medida: no se ajustó por humedad.",
+    ]);
+    ws.addRow([
+      C.esNumero(res.practico.grasa)
+        ? `Grasa teórica: ${res.teorico.grasa.toFixed(2)} % · grasa medida: ${res.practico.grasa.toFixed(2)} % · factor de ajuste por grasa: ${res.kGrasa.toFixed(4)} (aplica a grasa saturada, grasa trans, vitamina A y vitamina D)`
+        : "Sin grasa medida: grasa saturada, grasa trans, vitamina A y vitamina D no se ajustaron.",
     ]);
     ws.addRow([]);
     encabezado(
@@ -242,7 +247,8 @@
         "Componente",
         "Unidad /100 g",
         "Teórico mezcla",
-        "Teórico ajustado a humedad",
+        "Teórico ajustado",
+        "Base del ajuste",
         "Práctico (laboratorio)",
         "Diferencia (%)",
         "PRSD Horwitz (%)",
@@ -261,6 +267,7 @@
         unidad,
         r4(res.teorico[k]),
         r4(res.ajustado[k]),
+        C.POR_GRASA.has(k) ? "grasa práctica" : "humedad práctica",
         C.esNumero(p) ? r4(p) : p === "nd" ? "nd" : "sin dato",
         k in res.dif ? Math.round(res.dif[k] * 10) / 10 : "",
         h ? r2(h.prsd) : "",
@@ -282,7 +289,7 @@
     ws.addRow([
       "Proteína con N × 6,25. Minerales: según el informe de laboratorio.",
     ]);
-    [24, 12, 14, 16, 14, 13, 14, 44].forEach((w, i) => {
+    [24, 12, 14, 14, 16, 14, 13, 14, 11, 14, 14, 44].forEach((w, i) => {
       ws.getColumn(i + 1).width = w;
     });
   }

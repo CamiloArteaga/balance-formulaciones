@@ -392,19 +392,31 @@
 
   function pintarResultado(fs, res) {
     const P = res.practico;
-    $("#resumen").textContent = C.esNumero(P.hum)
-      ? `Humedad teórica de la mezcla ${num(res.teorico.hum, 2)} % · medida ${num(P.hum, 2)} % · factor de ajuste de sólidos k = ${num(res.kHum, 4)}`
-      : "Sin humedad medida: el teórico no se ajusta.";
+    const partes = [];
+    partes.push(
+      C.esNumero(P.hum)
+        ? `Humedad teórica de la mezcla ${num(res.teorico.hum, 2)} % · medida ${num(P.hum, 2)} % · factor de ajuste por humedad k = ${num(res.kHum, 4)}`
+        : "Sin humedad medida: no se ajusta por humedad.",
+    );
+    partes.push(
+      C.esNumero(P.grasa)
+        ? `Grasa teórica ${num(res.teorico.grasa, 2)} % · medida ${num(P.grasa, 2)} % · factor de ajuste por grasa k = ${num(res.kGrasa, 4)} (aplica a sat., trans, vit. A y vit. D)`
+        : "Sin grasa medida: sat., trans., vit. A y vit. D no se ajustan.",
+    );
+    $("#resumen").textContent = partes.join(" — ");
     const ps = elegidos();
-    let h = `<thead><tr><th>Componente /100 g</th><th class="num">Teórico mezcla</th><th class="num">Ajustado a humedad</th><th class="num">Práctico</th><th class="num">Diferencia</th><th class="num">Fórmula con dato</th></tr></thead><tbody>`;
+    let h = `<thead><tr><th>Componente /100 g</th><th class="num">Teórico mezcla</th><th class="num">Ajustado</th><th class="num">Práctico</th><th class="num">Diferencia</th><th class="num">Fórmula con dato</th></tr></thead><tbody>`;
     ps.forEach(([k, nombre, unidad], i) => {
       const p = P[k];
       const corte =
         i < ps.length - 1 && grupoDe(ps[i + 1][0]) !== grupoDe(k)
           ? ' class="grp"'
           : "";
+      const baseAjuste = C.POR_GRASA.has(k)
+        ? "ajustado a grasa práctica"
+        : "ajustado a humedad";
       h += `<tr${corte}><td class="card-tit">${esc(nombre)}, ${unidad}</td><td class="num" data-label="Teórico mezcla">${num(res.teorico[k], dec(res.teorico[k]))}</td>
-        <td class="num" data-label="Ajustado a humedad">${num(res.ajustado[k], dec(res.ajustado[k]))}</td>
+        <td class="num" data-label="Ajustado" title="${baseAjuste}">${num(res.ajustado[k], dec(res.ajustado[k]))}</td>
         <td class="num" data-label="Práctico">${C.esNumero(p) ? num(p, dec(p)) : p === "nd" ? "nd" : '<span class="suave">—</span>'}</td>
         <td data-label="Diferencia">${k in res.dif ? barra(res.dif[k], res.horwitz[k]) : ""}</td>
         <td class="num ${res.cubierto[k] < 99.99 ? "" : "suave"}" data-label="Fórmula con dato">${num(res.cubierto[k], 1)} %</td></tr>`;
