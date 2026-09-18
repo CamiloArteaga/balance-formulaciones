@@ -646,10 +646,15 @@ tr.picker .nota {
 .legend {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 6px 18px;
-  font-size: 12.5px;
+  font-size: 14px;
   color: var(--ink-soft);
-  padding-top: 10px;
+  margin-bottom: 14px;
+}
+.legend strong {
+  color: var(--ink);
+  flex-basis: 100%;
 }
 .legend span::before {
   content: "";
