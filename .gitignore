@@ -9,3 +9,4 @@
 privado/
 biblioteca_privada*.json
 formulaciones/
+.claude/
