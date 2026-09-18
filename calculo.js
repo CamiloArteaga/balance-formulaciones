@@ -48,6 +48,12 @@
   // Sat/trans son fracción de la grasa total, y vit A/D son liposolubles:
   // se ajustan a la grasa práctica en vez de a la humedad.
   const POR_GRASA = new Set(["sat", "trans", "vita", "vitd"]);
+  // Azúcares añadidos no se mide en el laboratorio: se ajusta a los
+  // azúcares totales prácticos, no a la humedad.
+  const POR_AZUCAR = new Set(["aza"]);
+  // Ninguno de estos 5 se mide directo en el laboratorio: su "práctico"
+  // es el valor calculado (ajustado), no un dato medido.
+  const CALCULADOS = new Set([...POR_GRASA, ...POR_AZUCAR]);
 
   // PRSD de Horwitz modificado (Thompson, 2000): satura en 22 % por debajo
   // de 1,2e-7 (120 ppb), donde la ecuación original diverge sin respaldo
@@ -191,18 +197,25 @@
     const kHum = esNumero(lab.hum) ? (100 - lab.hum) / (100 - teorico.hum) : 1;
     const kGrasa =
       esNumero(lab.grasa) && teorico.grasa > 0 ? lab.grasa / teorico.grasa : 1;
+    const kAzt =
+      esNumero(lab.azt) && teorico.azt > 0 ? lab.azt / teorico.azt : 1;
     const ajustado = {};
     for (const [k] of PARAMS)
       ajustado[k] =
         k === "hum" && esNumero(lab.hum)
           ? lab.hum
-          : teorico[k] * (POR_GRASA.has(k) ? kGrasa : kHum);
+          : teorico[k] *
+            (POR_GRASA.has(k) ? kGrasa : POR_AZUCAR.has(k) ? kAzt : kHum);
     const practico = { ...lab };
     if (["hum", "prot", "grasa", "cen"].every((k) => esNumero(lab[k]))) {
       practico.cho = 100 - (lab.hum + lab.prot + lab.grasa + lab.cen);
     }
+    for (const k of CALCULADOS) {
+      if (!esNumero(practico[k])) practico[k] = ajustado[k];
+    }
     const dif = {};
     for (const [k] of PARAMS) {
+      if (CALCULADOS.has(k)) continue;
       if (esNumero(practico[k]) && practico[k] !== 0)
         dif[k] = ((ajustado[k] - practico[k]) / practico[k]) * 100;
     }
@@ -224,6 +237,7 @@
       total,
       kHum,
       kGrasa,
+      kAzt,
       ajustado,
       practico,
       dif,
@@ -320,6 +334,8 @@
     PARAMS,
     NOMBRE,
     POR_GRASA,
+    POR_AZUCAR,
+    CALCULADOS,
     normalizar,
     perfilUSDA,
     complementar,

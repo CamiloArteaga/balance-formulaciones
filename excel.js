@@ -241,6 +241,11 @@
         ? `Grasa teórica: ${res.teorico.grasa.toFixed(2)} % · grasa medida: ${res.practico.grasa.toFixed(2)} % · factor de ajuste por grasa: ${res.kGrasa.toFixed(4)} (aplica a grasa saturada, grasa trans, vitamina A y vitamina D)`
         : "Sin grasa medida: grasa saturada, grasa trans, vitamina A y vitamina D no se ajustaron.",
     ]);
+    ws.addRow([
+      C.esNumero(res.practico.azt)
+        ? `Azúcares totales teóricos: ${res.teorico.azt.toFixed(2)} % · azúcares totales medidos: ${res.practico.azt.toFixed(2)} % · factor de ajuste por azúcares: ${res.kAzt.toFixed(4)} (aplica a azúcares añadidos)`
+        : "Sin azúcares totales medidos: azúcares añadidos no se ajustó.",
+    ]);
     ws.addRow([]);
     encabezado(
       ws.addRow([
@@ -262,17 +267,26 @@
       const p = res.practico[k];
       const h = res.horwitz[k];
       const az = h ? Math.abs(h.z) : null;
+      const calculado = C.CALCULADOS.has(k);
       ws.addRow([
         nombre,
         unidad,
         r4(res.teorico[k]),
         r4(res.ajustado[k]),
-        C.POR_GRASA.has(k) ? "grasa práctica" : "humedad práctica",
-        C.esNumero(p) ? r4(p) : p === "nd" ? "nd" : "sin dato",
-        k in res.dif ? Math.round(res.dif[k] * 10) / 10 : "",
-        h ? r2(h.prsd) : "",
-        h ? Math.round(h.z * 100) / 100 : "",
-        az == null
+        C.POR_GRASA.has(k)
+          ? "grasa práctica"
+          : C.POR_AZUCAR.has(k)
+            ? "azúcares totales prácticos"
+            : "humedad práctica",
+        C.esNumero(p)
+          ? r4(p) + (calculado ? " *" : "")
+          : p === "nd"
+            ? "nd"
+            : "sin dato",
+        calculado ? "" : k in res.dif ? Math.round(res.dif[k] * 10) / 10 : "",
+        calculado || !h ? "" : r2(h.prsd),
+        calculado || !h ? "" : Math.round(h.z * 100) / 100,
+        calculado || az == null
           ? ""
           : az <= 2
             ? "Aceptable"
@@ -280,14 +294,16 @@
               ? "Cuestionable"
               : "No aceptable",
         r2(res.cubierto[k]),
-        k === "cho" && C.esNumero(p)
-          ? "100 − (humedad + proteína + grasa + cenizas)"
-          : origenLab[k] || "",
+        calculado
+          ? "Calculado, no se mide directo en el laboratorio"
+          : k === "cho" && C.esNumero(p)
+            ? "100 − (humedad + proteína + grasa + cenizas)"
+            : origenLab[k] || "",
       ]);
     }
     ws.addRow([]);
     ws.addRow([
-      "Proteína con N × 6,25. Minerales: según el informe de laboratorio.",
+      "Proteína con N × 6,25. Minerales: según el informe de laboratorio. * Grasa saturada, grasa trans, vitamina A, vitamina D y azúcares añadidos son valores calculados, no medidos.",
     ]);
     [24, 12, 14, 14, 16, 14, 13, 14, 11, 14, 14, 44].forEach((w, i) => {
       ws.getColumn(i + 1).width = w;

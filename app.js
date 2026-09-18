@@ -419,6 +419,11 @@
         ? `Grasa teórica ${num(res.teorico.grasa, 2)} % · medida ${num(P.grasa, 2)} % · factor de ajuste por grasa k = ${num(res.kGrasa, 4)} (aplica a sat., trans, vit. A y vit. D)`
         : "Sin grasa medida: sat., trans., vit. A y vit. D no se ajustan.",
     );
+    partes.push(
+      C.esNumero(P.azt)
+        ? `Azúcares totales teóricos ${num(res.teorico.azt, 2)} % · medidos ${num(P.azt, 2)} % · factor de ajuste por azúcares k = ${num(res.kAzt, 4)} (aplica a azúcares añadidos)`
+        : "Sin azúcares totales medidos: azúcares añadidos no se ajusta.",
+    );
     $("#resumen").textContent = partes.join(" — ");
     pintarLabCalculado(res);
     const ps = elegidos();
@@ -431,11 +436,17 @@
           : "";
       const baseAjuste = C.POR_GRASA.has(k)
         ? "ajustado a grasa práctica"
-        : "ajustado a humedad";
+        : C.POR_AZUCAR.has(k)
+          ? "ajustado a azúcares totales prácticos"
+          : "ajustado a humedad";
+      const calculado = C.CALCULADOS.has(k);
+      const titPractico = calculado
+        ? ` title="calculado, no se mide directo en el laboratorio (${baseAjuste})"`
+        : "";
       h += `<tr${corte}><td class="card-tit">${esc(nombre)}, ${unidad}</td><td class="num" data-label="Teórico mezcla">${num(res.teorico[k], dec(res.teorico[k]))}</td>
         <td class="num" data-label="Ajustado" title="${baseAjuste}">${num(res.ajustado[k], dec(res.ajustado[k]))}</td>
-        <td class="num" data-label="Práctico">${C.esNumero(p) ? num(p, dec(p)) : p === "nd" ? "nd" : '<span class="suave">—</span>'}</td>
-        <td data-label="Diferencia">${k in res.dif ? barra(res.dif[k], res.horwitz[k]) : ""}</td>
+        <td class="num" data-label="Práctico"${titPractico}>${C.esNumero(p) ? num(p, dec(p)) + (calculado ? " *" : "") : p === "nd" ? "nd" : '<span class="suave">—</span>'}</td>
+        <td data-label="Diferencia">${k in res.dif ? barra(res.dif[k], res.horwitz[k]) : calculado ? '<span class="suave">calculado</span>' : ""}</td>
         <td class="num ${res.cubierto[k] < 99.99 ? "" : "suave"}" data-label="Fórmula con dato">${num(res.cubierto[k], 1)} %</td></tr>`;
     });
     $("#t-resultado").innerHTML = ps.length
