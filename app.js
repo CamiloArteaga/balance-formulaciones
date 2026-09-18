@@ -364,6 +364,22 @@
       : `<p class="nota">Ninguno de los componentes elegidos se mide en el laboratorio.</p>`;
   }
 
+  function pintarLabCalculado(res) {
+    const claves = ["sat", "trans", "vita", "vitd", "aza"].filter((k) =>
+      st.claves.includes(k),
+    );
+    $("#lab-calculado").innerHTML = claves.length
+      ? `<p class="nota">Calculados a partir de grasa y azúcares totales prácticos (no se miden directo en el laboratorio):</p>` +
+        claves
+          .map((k) => {
+            const [, nombre, unidad] = C.PARAMS.find((p) => p[0] === k);
+            const v = res.ajustado[k];
+            return `<label>${esc(nombre)} (${unidad})<output>${C.esNumero(v) ? num(v, dec(v)) : "—"}</output></label>`;
+          })
+          .join("")
+      : "";
+  }
+
   function barra(d, horw) {
     const z = horw ? Math.abs(horw.z) : null;
     const clase =
@@ -404,6 +420,7 @@
         : "Sin grasa medida: sat., trans., vit. A y vit. D no se ajustan.",
     );
     $("#resumen").textContent = partes.join(" — ");
+    pintarLabCalculado(res);
     const ps = elegidos();
     let h = `<thead><tr><th>Componente /100 g</th><th class="num">Teórico mezcla</th><th class="num">Ajustado</th><th class="num">Práctico</th><th class="num">Diferencia</th><th class="num">Fórmula con dato</th></tr></thead><tbody>`;
     ps.forEach(([k, nombre, unidad], i) => {
