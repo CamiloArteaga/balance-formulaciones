@@ -137,14 +137,21 @@
 
   function entradaPara(nombre) {
     const e = st.elecciones[C.normalizar(nombre)];
-    if (e && e.fdc)
+    if (e && e.fdc) {
+      const enBiblioteca = todas().find(
+        (b) => b.tipo === "usda" && b.fdc === e.fdc,
+      );
       return {
         nombre,
         tipo: "usda",
         fdc: e.fdc,
         estado: "elegido",
         nota: "Elegido en la herramienta",
+        ...(enBiblioteca && enBiblioteca.azucarAnadida
+          ? { azucarAnadida: true }
+          : {}),
       };
+    }
     if (e && e.bib) {
       const b = C.buscarEnBiblioteca(e.bib, todas());
       if (b) return { estado: "revisado", ...b };
