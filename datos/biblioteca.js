@@ -1124,7 +1124,7 @@ window.BIBLIOTECA = [
       na: 679,
       vitc: 0,
       sat: 14.3,
-      trans: 7140.0,
+      trans: 7.14,
       col: 0,
       vita: 0,
       vitd: 0,
@@ -3477,7 +3477,7 @@ window.BIBLIOTECA = [
   },
   {
     nombre: "Tocineta",
-    alias: ["bacon", "tocino"],
+    alias: ["bacon", "tocineta frita"],
     tipo: "usda",
     fdc: "168322",
     estado: "propuesto",
@@ -4635,5 +4635,14 @@ window.BIBLIOTECA = [
     fdc: "169742",
     estado: "propuesto",
     nota: "SR Legacy «Rice noodles, dry».",
+  },
+  // Tocino fresco (05-oct-2026).
+  {
+    nombre: "Panceta de cerdo",
+    alias: ["panceta", "tocino fresco", "barriga de cerdo", "pancetta"],
+    tipo: "usda",
+    fdc: "167812",
+    estado: "propuesto",
+    nota: "SR Legacy «Pork, fresh, belly, raw». Tocino sin curar ni ahumar; la tocineta curada es otra entrada.",
   },
 ];
