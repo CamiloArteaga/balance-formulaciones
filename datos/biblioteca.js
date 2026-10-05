@@ -20,14 +20,14 @@ window.BIBLIOTECA = [
   },
   {
     nombre: "Sal refinada",
-    alias: ["sal"],
+    alias: ["sal", "sal de mesa", "sal marina", "sal yodada"],
     tipo: "usda",
     fdc: "173468",
     estado: "revisado",
   },
   {
     nombre: "Ajo en polvo",
-    alias: [],
+    alias: ["ajo deshidratado"],
     tipo: "usda",
     fdc: "171325",
     estado: "revisado",
@@ -50,7 +50,7 @@ window.BIBLIOTECA = [
   },
   {
     nombre: "Proteína concentrada de soya",
-    alias: ["concentrado de soya"],
+    alias: ["concentrado de soya", "proteina concentrada"],
     tipo: "usda",
     fdc: "172447",
     estado: "propuesto",
@@ -278,7 +278,7 @@ window.BIBLIOTECA = [
   },
   {
     nombre: "Gelatina sin sabor",
-    alias: ["gelatina sin sabor en polvo", "gelatina en polvo", "grenetina"],
+    alias: ["gelatina sin sabor en polvo", "gelatina en polvo", "grenetina", "gelatina"],
     tipo: "usda",
     fdc: "169599",
     estado: "propuesto",
@@ -290,6 +290,7 @@ window.BIBLIOTECA = [
       "aislado de soya",
       "aislado de proteina de soya",
       "proteina de soya",
+      "proteina aislada",
     ],
     tipo: "usda",
     fdc: "174276",
@@ -298,7 +299,7 @@ window.BIBLIOTECA = [
   },
   {
     nombre: "Lecitina de soya",
-    alias: ["lecitina"],
+    alias: ["lecitina", "lectina de soya"],
     tipo: "usda",
     fdc: "171426",
     estado: "propuesto",
@@ -314,7 +315,7 @@ window.BIBLIOTECA = [
   },
   {
     nombre: "Polvo para hornear",
-    alias: ["polvo de hornear"],
+    alias: ["polvo de hornear", "polvo hornear"],
     tipo: "usda",
     fdc: "172805",
     estado: "revisado",
@@ -492,6 +493,8 @@ window.BIBLIOTECA = [
       "sal de cura",
       "sal curante",
       "sal de nitro- sal nitral",
+      "nitral",
+      "sal nitral 12%",
     ],
     tipo: "valores",
     ref: "USDA Branded (ID: 1777297)",
@@ -698,7 +701,7 @@ window.BIBLIOTECA = [
   },
   {
     nombre: "Propionato de calcio",
-    alias: ["propionato"],
+    alias: ["propionato", "propianato de calcio"],
     tipo: "valores",
     ref: "Estequiometría: Ca(C3H5O2)2 (186,22 g/mol)",
     valores: {
@@ -884,7 +887,7 @@ window.BIBLIOTECA = [
   },
   {
     nombre: "Tripolifosfato de sodio",
-    alias: ["tripolisfosfato de sodio", "tripolifosfato", "stpp"],
+    alias: ["tripolisfosfato de sodio", "tripolifosfato", "stpp", "polifosfato", "polifosfatos", "fosfatos"],
     tipo: "valores",
     ref: "Estequiometría: Na5P3O10 (367,86 g/mol)",
     valores: {
@@ -1102,7 +1105,7 @@ window.BIBLIOTECA = [
   // Ingredientes de su bibliografía, con los mismos ID.
   {
     nombre: "Harina de trigo",
-    alias: [],
+    alias: ["harina", "harina de trigo fortificada"],
     tipo: "usda",
     fdc: "168896",
     estado: "revisado",
@@ -1156,7 +1159,7 @@ window.BIBLIOTECA = [
   },
   {
     nombre: "Canela molida",
-    alias: [],
+    alias: ["canela"],
     tipo: "usda",
     fdc: "171320",
     estado: "revisado",
@@ -1172,7 +1175,7 @@ window.BIBLIOTECA = [
   },
   {
     nombre: "Clavo molido",
-    alias: [],
+    alias: ["clavos", "clavo"],
     tipo: "usda",
     fdc: "171321",
     estado: "revisado",
@@ -1196,7 +1199,7 @@ window.BIBLIOTECA = [
   },
   {
     nombre: "Tocino",
-    alias: [],
+    alias: ["tocino de cerdo"],
     tipo: "usda",
     fdc: "168277",
     estado: "revisado",
@@ -1204,7 +1207,7 @@ window.BIBLIOTECA = [
   },
   {
     nombre: "Carne res",
-    alias: [],
+    alias: ["carne de res", "carne"],
     tipo: "usda",
     fdc: "173086",
     estado: "revisado",
@@ -1212,7 +1215,7 @@ window.BIBLIOTECA = [
   },
   {
     nombre: "Pimienta negra",
-    alias: [],
+    alias: ["pimienta", "pimineta negra"],
     tipo: "usda",
     fdc: "170931",
     estado: "revisado",
@@ -1260,7 +1263,7 @@ window.BIBLIOTECA = [
   },
   {
     nombre: "Huevo",
-    alias: [],
+    alias: ["huevos", "huevo entero"],
     tipo: "usda",
     fdc: "748967",
     estado: "revisado",
@@ -1276,7 +1279,7 @@ window.BIBLIOTECA = [
   },
   {
     nombre: "Café instataneo",
-    alias: [],
+    alias: ["cafe instantaneo"],
     tipo: "usda",
     fdc: "171893",
     estado: "revisado",
@@ -1284,7 +1287,7 @@ window.BIBLIOTECA = [
   },
   {
     nombre: "Salvado de trigo",
-    alias: [],
+    alias: ["salvado"],
     tipo: "usda",
     fdc: "169722",
     estado: "revisado",
@@ -1292,7 +1295,7 @@ window.BIBLIOTECA = [
   },
   {
     nombre: "Comino en polvo",
-    alias: [],
+    alias: ["comino", "comino molido"],
     tipo: "usda",
     fdc: "170923",
     estado: "revisado",
@@ -1309,24 +1312,10 @@ window.BIBLIOTECA = [
   {
     nombre: "Avena",
     alias: [],
-    tipo: "valores",
-    ref: "USDA Branded (ID: 2503998)",
-    valores: {
-      prot: 11.1,
-      grasa: 6.67,
-      cho: 68.9,
-      fib: 11.1,
-      azt: 0,
-      ca: 44,
-      fe: 4,
-      k: 0,
-      na: 0,
-      sat: 1.11,
-      trans: 0,
-      col: 0,
-    },
+    tipo: "usda",
+    fdc: "169705",
     estado: "revisado",
-    nota: "ID de su bibliografía. USDA Branded (ID: 2503998): etiqueta Branded (porción 45 iu); porción pequeña o en otra unidad: los valores por 100 g pueden ser imprecisos. El ID 2038206 no trae vitamina A.",
+    nota: "SR Legacy «Oats». Reemplaza la etiqueta Branded 2503998 de su bibliografía (05-oct-2026, decisión suya tras contrastar con los Cálculo TN: empate (1 formulación medida); el genérico trae humedad y cenizas, la etiqueta declaraba la porción en «iu»).",
   },
   {
     nombre: "Aceite de canola",
@@ -1338,7 +1327,7 @@ window.BIBLIOTECA = [
   },
   {
     nombre: "Cocoa en polvo",
-    alias: ["cacao en polvo"],
+    alias: ["cacao en polvo", "cocoa"],
     tipo: "usda",
     fdc: "169593",
     estado: "revisado",
@@ -1346,7 +1335,7 @@ window.BIBLIOTECA = [
   },
   {
     nombre: "Ajo crudo",
-    alias: [],
+    alias: ["ajo", "ajo fresco"],
     tipo: "usda",
     fdc: "169230",
     estado: "revisado",
@@ -1354,7 +1343,7 @@ window.BIBLIOTECA = [
   },
   {
     nombre: "Pimentón crudo",
-    alias: [],
+    alias: ["pimenton rojo"],
     tipo: "usda",
     fdc: "170108",
     estado: "revisado",
@@ -1370,7 +1359,7 @@ window.BIBLIOTECA = [
   },
   {
     nombre: "Leche entera",
-    alias: [],
+    alias: ["leche", "leche entera pasteurizada"],
     tipo: "usda",
     fdc: "746782",
     estado: "revisado",
@@ -1402,7 +1391,7 @@ window.BIBLIOTECA = [
   },
   {
     nombre: "Hierbabuena fresca",
-    alias: [],
+    alias: ["hierbabuena"],
     tipo: "usda",
     fdc: "173474",
     estado: "revisado",
@@ -1434,7 +1423,7 @@ window.BIBLIOTECA = [
   },
   {
     nombre: "Uvas pasas",
-    alias: [],
+    alias: ["uva deshidratada", "uvas deshidratadas"],
     tipo: "usda",
     fdc: "168165",
     estado: "revisado",
@@ -1490,7 +1479,7 @@ window.BIBLIOTECA = [
   },
   {
     nombre: "Mora (frescos)",
-    alias: [],
+    alias: ["mora"],
     tipo: "usda",
     fdc: "173946",
     estado: "revisado",
@@ -1566,7 +1555,7 @@ window.BIBLIOTECA = [
   },
   {
     nombre: "Coco natural pulpa",
-    alias: [],
+    alias: ["coco"],
     tipo: "usda",
     fdc: "170169",
     estado: "revisado",
@@ -1598,7 +1587,7 @@ window.BIBLIOTECA = [
   },
   {
     nombre: "Papa cruda con cáscara",
-    alias: [],
+    alias: ["papa"],
     tipo: "usda",
     fdc: "170026",
     estado: "revisado",
@@ -1684,7 +1673,7 @@ window.BIBLIOTECA = [
   },
   {
     nombre: "Grasa de cerdo",
-    alias: [],
+    alias: ["grasa"],
     tipo: "usda",
     fdc: "167813",
     estado: "revisado",
@@ -1742,7 +1731,7 @@ window.BIBLIOTECA = [
   },
   {
     nombre: "Queso mozarella",
-    alias: [],
+    alias: ["queso mozzarella"],
     tipo: "usda",
     fdc: "170845",
     estado: "revisado",
@@ -1750,7 +1739,7 @@ window.BIBLIOTECA = [
   },
   {
     nombre: "Uchuva (seco)",
-    alias: ["uchuva (seco"],
+    alias: ["uchuva (seco", "uchuva deshidratada"],
     tipo: "valores",
     ref: "USDA Branded (ID: 2670392)",
     valores: {
@@ -1774,29 +1763,15 @@ window.BIBLIOTECA = [
   },
   {
     nombre: "Mango (seco)",
-    alias: [],
-    tipo: "valores",
-    ref: "USDA Branded (ID: 2553621)",
-    valores: {
-      prot: 0,
-      grasa: 0,
-      cho: 49.1,
-      fib: 5.3,
-      azt: 42.1,
-      ca: 0,
-      fe: 0,
-      k: 0,
-      na: 0,
-      sat: 0.19,
-      trans: 0,
-      col: 0,
-    },
+    alias: ["mango deshidratado"],
+    tipo: "usda",
+    fdc: "169091",
     estado: "revisado",
-    nota: "ID de su bibliografía. USDA Branded (ID: 2553621): etiqueta Branded (porción 57 g). El ID 2428551 no trae vitamina A.",
+    nota: "SR Legacy «Mango, dried, sweetened». Reemplaza la etiqueta Branded 2553621 de su bibliografía (05-oct-2026, decisión suya tras contrastar con los Cálculo TN: error medio de azúcares 16,3 frente a 18,0 del ID anterior en 10 formulaciones medidas).",
   },
   {
     nombre: "Piña (seco)",
-    alias: [],
+    alias: ["pina deshidratada"],
     tipo: "valores",
     ref: "USDA Branded (ID: 2072745)",
     valores: {
@@ -1818,7 +1793,7 @@ window.BIBLIOTECA = [
   },
   {
     nombre: "Arandano (seco)",
-    alias: [],
+    alias: ["arandanos deshidratados"],
     tipo: "valores",
     ref: "USDA FNDDS (ID: 2709202); grasa trans: USDA Branded (ID: 2634473)",
     valores: {
@@ -1895,7 +1870,7 @@ window.BIBLIOTECA = [
   },
   {
     nombre: "Flor de jamaica (seco)",
-    alias: [],
+    alias: ["flor de jamaica"],
     tipo: "valores",
     ref: "USDA Branded (ID: 2408669)",
     valores: {
@@ -1948,7 +1923,7 @@ window.BIBLIOTECA = [
   },
   {
     nombre: "Leche entera en polvo",
-    alias: [],
+    alias: ["leche en polvo"],
     tipo: "valores",
     ref: "USDA FNDDS (ID: 2705585); grasa trans: USDA Branded (ID: 2489423)",
     valores: {
@@ -1993,7 +1968,7 @@ window.BIBLIOTECA = [
   },
   {
     nombre: "Platano verde",
-    alias: [],
+    alias: ["platano harton verde"],
     tipo: "valores",
     ref: "USDA FNDDS (ID: 2709560); grasa trans: USDA Branded (ID: 2678742)",
     valores: {
@@ -2054,24 +2029,11 @@ window.BIBLIOTECA = [
   {
     nombre: "Glucosa",
     alias: [],
-    tipo: "valores",
-    ref: "USDA Branded (ID: 1918585)",
-    valores: {
-      prot: 0,
-      grasa: 0,
-      cho: 45.4,
-      fib: 0,
-      azt: 45.4,
-      ca: 0,
-      fe: 0,
-      na: 15,
-      vitc: 0,
-      sat: 0,
-      trans: 0,
-      col: 0,
-    },
+    tipo: "usda",
+    fdc: "168837",
+    azucarAnadida: true,
     estado: "revisado",
-    nota: "ID de su bibliografía. USDA Branded (ID: 1918585): etiqueta Branded (porción 33 g).",
+    nota: "SR Legacy «Syrups, corn, light». Reemplaza la etiqueta Branded 1918585 de su bibliografía (05-oct-2026, decisión suya tras contrastar con los Cálculo TN: error medio de azúcares 10,6 frente a 13,1 del ID anterior en 7 formulaciones medidas).",
   },
   {
     nombre: "Harina de maiz amarillo",
@@ -2083,7 +2045,7 @@ window.BIBLIOTECA = [
   },
   {
     nombre: "Bocadillo de guayaba",
-    alias: [],
+    alias: ["bocadillo"],
     tipo: "valores",
     ref: "USDA Branded (ID: 2668028)",
     valores: {
@@ -2107,23 +2069,10 @@ window.BIBLIOTECA = [
   {
     nombre: "Mantequilla",
     alias: [],
-    tipo: "valores",
-    ref: "USDA Branded (ID: 2103635)",
-    valores: {
-      prot: 0,
-      grasa: 78.6,
-      cho: 0,
-      azt: 7.14,
-      ca: 71,
-      fe: 1.29,
-      na: 600,
-      vitc: 0,
-      sat: 57.1,
-      trans: 0,
-      col: 243,
-    },
+    tipo: "usda",
+    fdc: "173410",
     estado: "revisado",
-    nota: "ID de su bibliografía. USDA Branded (ID: 2103635): etiqueta Branded (porción 14 g). El ID 2378745 no trae vitamina D.",
+    nota: "SR Legacy «Butter, salted». Reemplaza la etiqueta Branded 2103635 de su bibliografía (05-oct-2026, decisión suya tras contrastar con los Cálculo TN: empate en grasa (2,57 frente a 2,54 en 12 formulaciones); el genérico trae humedad y cenizas, la etiqueta no).",
   },
   {
     nombre: "Chontaduro",
@@ -2337,7 +2286,7 @@ window.BIBLIOTECA = [
   },
   {
     nombre: "Miga de pan seca",
-    alias: [],
+    alias: ["miga de pan"],
     tipo: "usda",
     fdc: "174928",
     estado: "revisado",
@@ -2376,7 +2325,7 @@ window.BIBLIOTECA = [
   },
   {
     nombre: "Cultivo de yogurt",
-    alias: [],
+    alias: ["cultivo lacteo", "cultivo lactico"],
     tipo: "valores",
     ref: "USDA Branded (ID: 2031052)",
     valores: {
@@ -2469,7 +2418,7 @@ window.BIBLIOTECA = [
   // Ingredientes de uso común en panadería, cárnicos, lácteos y bebidas (fuera de su bibliografía).
   {
     nombre: "Azúcar blanca",
-    alias: ["azucar", "azucar refinada", "azucar blanca refinada"],
+    alias: ["azucar", "azucar refinada", "azucar blanca refinada", "azucar comun"],
     tipo: "usda",
     fdc: "169655",
     azucarAnadida: true,
@@ -2545,7 +2494,7 @@ window.BIBLIOTECA = [
   },
   {
     nombre: "Aceite de soya",
-    alias: ["aceite de soja"],
+    alias: ["aceite de soja", "aceite", "aceite vegetal", "mezcla de aceites vegetales"],
     tipo: "usda",
     fdc: "171411",
     estado: "propuesto",
@@ -2617,7 +2566,7 @@ window.BIBLIOTECA = [
   },
   {
     nombre: "Queso fresco",
-    alias: ["queso campesino"],
+    alias: ["queso campesino", "queso", "queso (fresco semigraso, semiblando)"],
     tipo: "usda",
     fdc: "172223",
     estado: "propuesto",
@@ -2657,7 +2606,7 @@ window.BIBLIOTECA = [
   },
   {
     nombre: "Maní",
-    alias: ["mani crudo", "cacahuate"],
+    alias: ["mani crudo", "cacahuate", "mani sin piel"],
     tipo: "usda",
     fdc: "172430",
     estado: "propuesto",
@@ -2697,7 +2646,7 @@ window.BIBLIOTECA = [
   },
   {
     nombre: "Pechuga de pollo",
-    alias: ["pechuga de pollo sin piel"],
+    alias: ["pechuga de pollo sin piel", "carne pechuga de pollo"],
     tipo: "usda",
     fdc: "171077",
     estado: "propuesto",
@@ -3187,7 +3136,7 @@ window.BIBLIOTECA = [
   },
   {
     nombre: "Agua",
-    alias: ["agua potable", "hielo"],
+    alias: ["agua potable", "hielo", "agua fria", "agua helada", "hielo molido"],
     tipo: "agua",
     estado: "revisado",
   },
@@ -4644,5 +4593,31 @@ window.BIBLIOTECA = [
     fdc: "167812",
     estado: "propuesto",
     nota: "SR Legacy «Pork, fresh, belly, raw». Tocino sin curar ni ahumar; la tocineta curada es otra entrada.",
+  },
+  // Nombres de sus Cálculo TN (05-oct-2026).
+  {
+    nombre: "Banano deshidratado",
+    alias: ["banano seco", "harina de banano"],
+    tipo: "usda",
+    fdc: "173945",
+    estado: "propuesto",
+    nota: "SR Legacy «Bananas, dehydrated, or banana powder».",
+  },
+  {
+    nombre: "Chocolate 45-59 % cacao",
+    alias: ["chocolate 58%", "chocolate 58", "chocolate 46", "chocolate 46%", "chocolate al 46%"],
+    tipo: "usda",
+    fdc: "170271",
+    estado: "propuesto",
+    nota: "SR Legacy «Chocolate, dark, 45- 59% cacao solids».",
+  },
+  {
+    nombre: "Ácido sórbico",
+    alias: ["acido sorbico"],
+    tipo: "valores",
+    ref: "Estequiometría (C6H8O2)",
+    valores: {"hum": 0, "prot": 0, "grasa": 0, "cen": 0, "cho": 100},
+    estado: "propuesto",
+    nota: "Ácido orgánico sin catión: cenizas 0 y carbohidratos por diferencia (residuo de cálculo, no aporte metabólico real). Mismo método que los demás aditivos por estequiometría.",
   },
 ];
